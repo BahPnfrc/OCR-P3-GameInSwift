@@ -8,6 +8,13 @@
 
 import Foundation
 
+// singleton design pattern
+//toto.shared.tata()
+
+Engineer.createAll()
+Medical.createAll()
+Military.createAll()
+
+let see = Toon.All
 let game = Game()
-game.staticMode()
 

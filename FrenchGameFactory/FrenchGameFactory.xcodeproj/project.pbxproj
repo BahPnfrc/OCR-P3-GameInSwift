@@ -10,6 +10,13 @@
 		0B9062EE25EE99FB00F7E328 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062ED25EE99FB00F7E328 /* main.swift */; };
 		0B9062F625EEA17F00F7E328 /* ConsoleIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062F525EEA17F00F7E328 /* ConsoleIO.swift */; };
 		0B9062F925F116FD00F7E328 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062F825F116FD00F7E328 /* Game.swift */; };
+		0B9C462425F7A74B0067AD6F /* Damage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C462325F7A74B0067AD6F /* Damage.swift */; };
+		0BB302BE25FBBAD0005C424F /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB302BD25FBBAD0005C424F /* Settings.swift */; };
+		0BB302C125FCF542005C424F /* Modifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB302C025FCF542005C424F /* Modifier.swift */; };
+		0BB302C425FD2B33005C424F /* Toto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB302C325FD2B33005C424F /* Toto.swift */; };
+		0BE46A1925F2D51D0073884F /* Toon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BE46A1825F2D51D0073884F /* Toon.swift */; };
+		0BE46A1C25F2D96E0073884F /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BE46A1B25F2D96E0073884F /* Tool.swift */; };
+		0BE46A1F25F420430073884F /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BE46A1E25F420430073884F /* Player.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,6 +36,13 @@
 		0B9062ED25EE99FB00F7E328 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		0B9062F525EEA17F00F7E328 /* ConsoleIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleIO.swift; sourceTree = "<group>"; };
 		0B9062F825F116FD00F7E328 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		0B9C462325F7A74B0067AD6F /* Damage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Damage.swift; sourceTree = "<group>"; };
+		0BB302BD25FBBAD0005C424F /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		0BB302C025FCF542005C424F /* Modifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modifier.swift; sourceTree = "<group>"; };
+		0BB302C325FD2B33005C424F /* Toto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toto.swift; sourceTree = "<group>"; };
+		0BE46A1825F2D51D0073884F /* Toon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toon.swift; sourceTree = "<group>"; };
+		0BE46A1B25F2D96E0073884F /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
+		0BE46A1E25F420430073884F /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +59,7 @@
 		0B9062E125EE99FB00F7E328 = {
 			isa = PBXGroup;
 			children = (
+				0BB302BD25FBBAD0005C424F /* Settings.swift */,
 				0B9062EC25EE99FB00F7E328 /* FrenchGameFactory */,
 				0B9062EB25EE99FB00F7E328 /* Products */,
 			);
@@ -64,6 +79,12 @@
 				0B9062ED25EE99FB00F7E328 /* main.swift */,
 				0B9062F525EEA17F00F7E328 /* ConsoleIO.swift */,
 				0B9062F825F116FD00F7E328 /* Game.swift */,
+				0BE46A1825F2D51D0073884F /* Toon.swift */,
+				0BB302C325FD2B33005C424F /* Toto.swift */,
+				0BB302C025FCF542005C424F /* Modifier.swift */,
+				0B9C462325F7A74B0067AD6F /* Damage.swift */,
+				0BE46A1E25F420430073884F /* Player.swift */,
+				0BE46A1B25F2D96E0073884F /* Tool.swift */,
 			);
 			path = FrenchGameFactory;
 			sourceTree = "<group>";
@@ -126,8 +147,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B9062EE25EE99FB00F7E328 /* main.swift in Sources */,
+				0BE46A1925F2D51D0073884F /* Toon.swift in Sources */,
+				0BB302BE25FBBAD0005C424F /* Settings.swift in Sources */,
+				0BB302C425FD2B33005C424F /* Toto.swift in Sources */,
 				0B9062F925F116FD00F7E328 /* Game.swift in Sources */,
+				0BE46A1C25F2D96E0073884F /* Tool.swift in Sources */,
+				0BE46A1F25F420430073884F /* Player.swift in Sources */,
 				0B9062F625EEA17F00F7E328 /* ConsoleIO.swift in Sources */,
+				0B9C462425F7A74B0067AD6F /* Damage.swift in Sources */,
+				0BB302C125FCF542005C424F /* Modifier.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

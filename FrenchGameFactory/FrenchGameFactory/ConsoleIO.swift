@@ -5,6 +5,7 @@
 //  Created by Pierre-Alexandre on 02/03/2021.
 //
 // https://www.raywenderlich.com/511-command-line-programs-on-macos-tutorial
+// https://www.journaldev.com/19612/swift-readline-swift-print
 
 import Foundation
 
@@ -17,11 +18,11 @@ enum OutputType {
 class ConsoleIO {
     
     // Messages can be passed to the console as Stderr or Stdout by default
-    func writeMessage(_ message: String, to: OutputType = .standard) {
+    static func write(_ message: String, to: OutputType = .standard) {
       switch to {
         case .standard:
             // Uses the regular Swift print() function
-            print("\(message)")
+            print("\(message)\n")
         case .error:
             // Uses the C function fputs to write to stderr
             // Stderr is a global variable and points to the standard error stream
@@ -29,18 +30,20 @@ class ConsoleIO {
       }
     }
     
-    func printHelp() {
+    
+    
+    static func printHelp() {
 
         // Upon running a program the path to its executable is passed as argument[0]
         // Argument[0] is accessible through the global CommandLine enum
         let executableName = (CommandLine.arguments[0] as NSString).lastPathComponent
             
-        writeMessage("\(executableName) :")
-        writeMessage("\(executableName) -n : Start a new game")
-        writeMessage("\(executableName) -s : Stats of the active game")
-        writeMessage("\(executableName) -q : Quit the active game")
-        writeMessage("\(executableName) -h : Show this help menu")
-        writeMessage("Type \(executableName) without an option to enter interactive mode.")
+        write("\(executableName) :")
+        write("\(executableName) -n : Start a new game")
+        write("\(executableName) -s : Stats of the active game")
+        write("\(executableName) -q : Quit the active game")
+        write("\(executableName) -h : Show this help menu")
+        write("Type \(executableName) without an option to enter interactive mode.")
     }
     
     func getInput() -> String {
