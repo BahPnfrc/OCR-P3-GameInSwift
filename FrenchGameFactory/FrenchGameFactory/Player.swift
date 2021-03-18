@@ -22,7 +22,7 @@ class Player {
     // Properties
     var ID: Int
     var name: String
-    var toons: [Toon]?
+    var toons: [Toon] = [Toon]()
     
     
     // https://www.behindthename.com/top/lists/france/1900

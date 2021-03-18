@@ -7,56 +7,39 @@
 
 import Foundation
 
-
-
 enum Mode: CaseIterable { case isVersusHuman, isVersusMachine }
-
-
-
 
 class Game {
     
     var mode: Mode
     var player: (main: Player, second: Player)
-        
-    var mainPlayer: String { player.main.name }
-    var secondPlayer: String { player.second.name }
-    
-    
-    func getFullNameWithTool(off toon: Toon) -> String {
-        return ""
-    }
-    
-    
-    private static func welcome() {
+
+    init(){
+        // MARK: A - MODE
         ConsoleIO.write("""
             WELCOME TO THE GAME
-            """)
-    }
-    
-    init(){
-        Game.welcome()
-        // A - MODE
-        ConsoleIO.write("""
             How do you want to play ?
             1. Against a friend
             2. Against the machine
             """)
         let modePrompt:Int = ConsoleIO.getIntInput(fromTo: 1...2)
         mode = modePrompt == 1 ? .isVersusHuman: .isVersusMachine
-        // B - MAIN PLAYER
+        
+        // MARK: B - MAIN PLAYER
         let mainNamePrompt: String = ConsoleIO.getStringInput(prompt: "your name")
         player.main = Human(mainNamePrompt) as Player
-        // C - SECOND PLAYER
+        
+        // MARK: C - SECOND PLAYER
         switch mode {
         case .isVersusHuman:
-            let secondNamePrompt = ConsoleIO.getStringInput(prompt: "the second player's name")
+            let secondNamePrompt = ConsoleIO.getStringInput(prompt: "the other player's name")
             player.second = Human(secondNamePrompt) as Player
         case .isVersusMachine:
+            
+            // MARK: D - LEVEL
             let machine = Machine()
-            // D - LEVEL
             ConsoleIO.write("""
-                Ok \(player.main.name), I'm \(machine.name) and I'll be your opponent !
+                Ok \(player.main.name), I'm \(machine.name) and I'm your opponent !
 
                 Choose my level :
                 1. Easy : Because you're soft and delicate
@@ -72,40 +55,58 @@ class Game {
         }
     }
     
-    func run(){
-        chooseToon(for: player.main)
-        chooseToon(for: player.second)
+    func thenRun(){
+        // MARK: E - CHOOSE TOONS
+        let header = (main: """
+            Ok \(player.main.name), time is to choose your toons.
+            You must pick one Engineer, one Military and one Medical.
+            """, second: "OK, \(player.second.name), it's your turn now.")
+        pickToons(for: player.main, withHeader: header.main)
+        
+        if self.mode == .isVersusHuman {
+            pickToons(for: player.second, withHeader: header.second)
+        } else {
+            machinePickToon() // COMPLETER
+        }
+        
     }
     
-    private func chooseToon(for player: Player){
-        ConsoleIO.write("""
-            Ok \(player.name), time is to choose your toons.
-            You must pick one Engineer, one Military and one Medical.
-            """)
-        
-        let toonTuples = [
+    private func pickToons(for player: Player, withHeader header: String){
+        ConsoleIO.write(header)
+        let toonTypes = [
              (array: Engineer.All, message: "There it goes all Engineers :"),
              (array: Military.All, message: "Time is to pick up a Military now :"),
              (array: Medical.All, message: "You can finally pick up your Medical :")]
-        
-        for toonTuple in toonTuples {
-            ConsoleIO.write(toonTuple.message)
-            for eachToon in toonTuple.array {
-                ConsoleIO.write(eachToon.getPresentation())
+        for toonType in toonTypes {
+            ConsoleIO.write(toonType.message)
+            // List all toons
+            for toon in toonType.array {
+                ConsoleIO.write(toon.getPresentation())
             }
-            let prompt = ConsoleIO.getIntInput(fromTo: 1...toonTuple.array.count)
-            player.toons?.append(toonTuple.array.first(where: {$0.ID == prompt})!)
+            // Choose a toon buy its ID
+            let promptForNumber: Int = ConsoleIO.getIntInput(fromTo: 1...toonType.array.count)
+            let chosenToon: Toon = toonType.array.first(where: {$0.ID == promptForNumber})!
+            // Choose a name for this toon
+            let promptForName: String = ConsoleIO.getStringInput(prompt: "a name for this toon")
+            chosenToon.name = promptForName
+            player.toons.append(chosenToon)
         }
     }
+    private func machinePickToon() {
+        
+    }
     
-    static func applyDamage(from attacker: Toon, to defender: Toon, with tool: Tool) -> String {
-        let biologicDamage: Double = tool.getBiologicDamage()
+    
+    
+    
+    private static func applyDamage(from attacker: Toon, to defender: Toon) -> String {
+        let biologicDamage: Double = attacker.tool!.getBiologicDamage()
             * attacker.getBiologicAttack()
             / defender.getBiologicDefense()
-        let kineticDamage: Double = tool.getKineticDamage()
+        let kineticDamage: Double = attacker.tool!.getKineticDamage()
             * attacker.getKineticAttack()
             / defender.getKineticDefense()
-        let thermicDamage: Double = tool.getThermicDamage()
+        let thermicDamage: Double = attacker.tool!.getThermicDamage()
             * attacker.getThermicAttack()
             / defender.getThermicDefense()
 

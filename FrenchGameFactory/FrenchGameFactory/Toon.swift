@@ -24,10 +24,10 @@ extension LifeSet {
 // MARK: Protocol : SkillSet
 protocol SkillSet {
     var skillSet: (
-        strenght: Double,
-        accuracy: Double,
-        experience: Double,
-        agility: Double)
+        strenght: Double, // Must balance out with accuracy
+        accuracy: Double, // Must balance out with strenght
+        experience: Double, // Must balance out with agility
+        agility: Double) // Must balance out with experience
         {get}
 }
 extension SkillSet {
@@ -64,39 +64,14 @@ enum Age: String, CaseIterable { case isJunior = "mid 30'", isAdult = "mid 40'",
 
 // MARK: Mother class
 class Toon: LifeSet, SkillSet, FightSet {
-    
-    private static var newID: Int = 0
-    private static func GetNewID() -> Int {
-        Toon.newID += 1
-        return Toon.newID
-    }
 
     var ID: Int
     var gender: Gender
     var age: Age
-    func getPossesive() -> String {
-        gender == .isMan ? "his " : "her "
-    }
-    func getAgeAndGender() -> String {
-        return gender.rawValue + " in " + getPossesive() + age.rawValue
-    }
     
     var name: String?
     var pic: String
     var title: String
-    func getFullName() -> String {
-        guard let name = name else {
-            return  title + " " + pic
-        }
-        return title + " " + name + " " + pic
-    }
-    
-    func getPresentation() -> String {
-        let name: String = String(ID) + ". " +  getFullName()
-        let ageAndGender: String = "A " + getAgeAndGender()
-        let tool: String = "armed with " + getPossesive() + self.tool!.getPicWithName()
-        return name + " : " + ageAndGender + ", " + tool
-    }
     
     var tool: Tool?
 
@@ -126,9 +101,9 @@ class Toon: LifeSet, SkillSet, FightSet {
            (Toon.defFight),
            (Toon.defFight))
     
-    init(_ gender: Gender, _ age: Age, _ icon: String, _ role: String ){
+    init(_ id: Int, _ gender: Gender, _ age: Age, _ icon: String, _ role: String ){
         
-        self.ID = Toon.GetNewID()
+        self.ID = id
         self.gender = gender
         self.age = age
         self.pic = icon
@@ -157,24 +132,40 @@ class Toon: LifeSet, SkillSet, FightSet {
         }
     }
 }
+
+// MARK: Mother extension
 extension Toon {
-
-
-    
-}
-
-
-protocol AllArray {
-    static var All: [Toon] {get set}
+    func getPossesive() -> String {
+        gender == .isMan ? "his " : "her "
+    }
+    func getAgeAndGender() -> String {
+        return gender.rawValue + " in " + getPossesive() + age.rawValue
+    }
+    func getFullName() -> String {
+        guard let name = name else {
+            return  title + " " + pic
+        }
+        return title + " " + name + " " + pic
+    }
+    func getPresentation() -> String {
+        let name: String = String(ID) + ". " +  getFullName()
+        let ageAndGender: String = "A " + getAgeAndGender()
+        let tool: String = "armed with " + getPossesive() + self.tool!.getPicWithName()
+        return name + " : " + ageAndGender + ", " + tool
+    }
 }
 
 // MARK: Daughter : Engineer
-final class Engineer: Toon, AllArray {
+final class Engineer: Toon {
     
-    static var All: [Toon] = [Engineer]()
+    private static var newID: Int = 0
+    private static func getNewID() -> Int {
+        Engineer.newID += 1
+        return Engineer.newID
+    }
 
-    override init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
-        super.init(gender, age, icon, role)
+    init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
+        super.init(Engineer.getNewID(), gender, age, icon, role)
         // Malus = Thermic, Bonus = Kinetic
         self.fightSet.biologic.defense *= Modifier.same()
         self.fightSet.biologic.attack *= Modifier.same()
@@ -184,6 +175,7 @@ final class Engineer: Toon, AllArray {
         self.fightSet.thermic.attack *= Modifier.malus()
     }
     
+    static var All: [Toon] = [Engineer]()
     static func createAll(){
         var toon: (pic: String, title: String)
         var basic: (pic: String, name: String)
@@ -213,14 +205,18 @@ final class Engineer: Toon, AllArray {
 }
 
 // MARK: Daughter : Medical
-final class Medical: Toon, AllArray {
-    
-    static var All: [Toon] = [Medical]()
+final class Medical: Toon {
+     
+    private static var newID: Int = 0
+    private static func getNewID() -> Int {
+        Medical.newID += 1
+        return Medical.newID
+    }
     
     let medecineTool = Tool("🩹", "SavageBandage", "💊", "HealPill")
     
-    override init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
-        super.init(gender, age, icon, role)
+    init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
+        super.init(Medical.getNewID(), gender, age, icon, role)
         // Malus = Kinetic, Bonus = Biologic
         self.fightSet.biologic.defense *= Modifier.bonus()
         self.fightSet.biologic.attack *= Modifier.bonus()
@@ -230,6 +226,7 @@ final class Medical: Toon, AllArray {
         self.fightSet.thermic.attack *= Modifier.same()
     }
     
+    static var All: [Toon] = [Medical]()
     static func createAll(){
         var toon: (pic: String, title: String)
         var basic: (pic: String, name: String)
@@ -259,12 +256,16 @@ final class Medical: Toon, AllArray {
 }
 
 // MARK: Daughter : Military
-final class Military: Toon, AllArray {
+final class Military: Toon {
     
-    static var All: [Toon] = [Military]()
+    private static var newID: Int = 0
+    private static func getNewID() -> Int {
+        Military.newID += 1
+        return Military.newID
+    }
     
-    override init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
-        super.init(gender, age, icon, role)
+    init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
+        super.init(Military.getNewID(), gender, age, icon, role)
         // Malus = Biologic, Bonus = Thermic
         self.fightSet.biologic.defense *= Modifier.malus()
         self.fightSet.biologic.attack *= Modifier.malus()
@@ -274,6 +275,7 @@ final class Military: Toon, AllArray {
         self.fightSet.thermic.attack *= Modifier.bonus()
     }
     
+    static var All: [Toon] = [Military]()
     static func createAll(){
         var toon: (pic: String, title: String)
         var basic: (pic: String, name: String)
