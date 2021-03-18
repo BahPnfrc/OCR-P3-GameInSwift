@@ -10,8 +10,8 @@ import Foundation
 // MARK: Protocols
 protocol ProfilSet {
     var isUpdated: Bool {get set}
-    var name: (basic: String, updated: String) {get}
     var pic: (basic: String, updated: String) {get}
+    var name: (basic: String, updated: String) {get}
 }
 protocol DamageSet {
     var damageSet:(
@@ -24,16 +24,22 @@ protocol DamageSet {
 // MARK: Mother class
 class Tool: ProfilSet, DamageSet{
     
+    // PROFIL SET
     var isUpdated: Bool = false
-    let name: (basic: String, updated: String)
-    let pic: (basic: String, updated: String)
+    internal let pic: (basic: String, updated: String)
+    internal let name: (basic: String, updated: String)
     
-    func getFullName() -> String{
-        return isUpdated == true ?
-        pic.updated + " " + name.updated :
-        pic.basic + " " + name.updated
+    func getPic() -> String {
+        isUpdated == true ? pic.updated : pic.basic
     }
-
+    func getName() -> String {
+        isUpdated == true ? name.updated : name.basic
+    }
+    func getPicWithName() -> String {
+        getPic() + " " + getName()
+    }
+    
+    // DAMAGE SET
     var damageSet : (
         biologic: (basic: Double, updated: Double),
         kinetic: (basic: Double, updated: Double),
@@ -42,23 +48,17 @@ class Tool: ProfilSet, DamageSet{
            (Setting.Tool.basicDamage, Setting.Tool.updatedDamage),
            (Setting.Tool.basicDamage, Setting.Tool.updatedDamage))
     
-    func getName() -> String {
-        return isUpdated == true ? name.updated : name.basic
-    }
-    func getPicture() -> String {
-        return isUpdated == true ? pic.basic : pic.updated
-    }
     func getBiologicDamage() -> Double {
-        return isUpdated == true ? damageSet.biologic.updated : damageSet.biologic.basic
+        isUpdated == true ? damageSet.biologic.updated : damageSet.biologic.basic
     }
     func getKineticDamage() -> Double {
-        return isUpdated == true ? damageSet.kinetic.updated : damageSet.kinetic.basic
+        isUpdated == true ? damageSet.kinetic.updated : damageSet.kinetic.basic
     }
     func getThermicDamage() -> Double {
-        return isUpdated == true ? damageSet.thermic.updated : damageSet.thermic.basic
+        isUpdated == true ? damageSet.thermic.updated : damageSet.thermic.basic
     }
     
-    static func getAgeExtraModifier (
+    fileprivate static func getAgeExtraModifier (
         _ age: Age,
         _ modifier: (forJunior: Double, forAdult: Double, forSenior: Double)) -> Double {
         

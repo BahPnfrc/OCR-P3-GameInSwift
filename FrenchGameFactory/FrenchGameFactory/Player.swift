@@ -11,10 +11,10 @@ import Foundation
 class Player {
     
     // Static
-    static let Max: Int = 2
     static var All: [Player] = [Player]()
-    static private var newID: Int = 0
-    static private func GetNewID() -> Int {
+    
+    private static var newID: Int = 0
+    private static func GetNewID() -> Int {
         Player.newID += 1
         return Player.newID
     }
@@ -22,7 +22,7 @@ class Player {
     // Properties
     var ID: Int
     var name: String
-    var toons: [Toon]? // COM
+    var toons: [Toon]?
     
     
     // https://www.behindthename.com/top/lists/france/1900
@@ -49,7 +49,7 @@ class Player {
          (isUsed: false, name: "Zilda")]
         
     // Init
-    init(_ name: String) {
+    init(named name: String) {
         self.name = name
         self.ID = Player.GetNewID()
     }
@@ -57,33 +57,32 @@ class Player {
 
 // MARK: Human class
 final class Human: Player { // COM
-    override init(_ name: String) {
-        super.init(name)
+    init(_ name: String) {
+        super.init(named: name)
     }
 }
 
 // MARK: Machine class
 final class Machine: Player {
     
-    private static let names: [String] = // COM
-        ["Grimhilde", "Brutus", "Ratigan"]
+    enum Level { case easy, medium, hard }
+    var level: Level = .medium
     
-    var level: Level // COM
+    private static let randomNames: [String] = [String]() //
+    private static var randomName: String {
+            Machine.randomNames.count > 0 ?
+            Machine.randomNames.randomElement()!:
+            "TheMachine"}
     
-    init(level: Level) {
-        self.level = level // COM
-        var randomName: String { // COM
-            return Machine.names.count > 0 ?
-                Machine.names.randomElement()!:
-                "Nero"
+    init(_ name: String?) {
+        guard let name = name else {
+            super.init(named: Machine.randomName)
+            return
         }
-        super.init(randomName)
+        super.init(named: name)
     }
-}
-
-// MARK: EXTENSION
-extension Machine { // COM
-    enum Level {
-        case easy, medium, hard
+    
+    convenience init() {
+        self.init(Machine.randomName)
     }
 }

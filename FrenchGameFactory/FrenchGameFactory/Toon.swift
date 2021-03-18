@@ -59,25 +59,43 @@ protocol StatSet {
 }
 
 // MARK: Enumations
-enum Gender: CaseIterable { case isMan, isWomen }
-enum Age: CaseIterable { case isJunior, isAdult, isSenior }
+enum Gender: String, CaseIterable { case isMan = "man", isWomen = "women" }
+enum Age: String, CaseIterable { case isJunior = "mid 30'", isAdult = "mid 40'", isSenior = "mid 50'" }
 
 // MARK: Mother class
 class Toon: LifeSet, SkillSet, FightSet {
     
-    static var All = [Toon]()
+    private static var newID: Int = 0
+    private static func GetNewID() -> Int {
+        Toon.newID += 1
+        return Toon.newID
+    }
 
+    var ID: Int
     var gender: Gender
     var age: Age
+    func getPossesive() -> String {
+        gender == .isMan ? "his " : "her "
+    }
+    func getAgeAndGender() -> String {
+        return gender.rawValue + " in " + getPossesive() + age.rawValue
+    }
     
     var name: String?
-    var picture: String
-    var job: String
-    func getFullName() -> String{
-        guard let name = self.name else {
-            return self.picture + " " + self.job
+    var pic: String
+    var title: String
+    func getFullName() -> String {
+        guard let name = name else {
+            return  title + " " + pic
         }
-        return self.picture + " " + self.job + " " + name
+        return title + " " + name + " " + pic
+    }
+    
+    func getPresentation() -> String {
+        let name: String = String(ID) + ". " +  getFullName()
+        let ageAndGender: String = "A " + getAgeAndGender()
+        let tool: String = "armed with " + getPossesive() + self.tool!.getPicWithName()
+        return name + " : " + ageAndGender + ", " + tool
     }
     
     var tool: Tool?
@@ -110,10 +128,11 @@ class Toon: LifeSet, SkillSet, FightSet {
     
     init(_ gender: Gender, _ age: Age, _ icon: String, _ role: String ){
         
+        self.ID = Toon.GetNewID()
         self.gender = gender
         self.age = age
-        self.picture = icon
-        self.job = role
+        self.pic = icon
+        self.title = role
         
         // Changing property according to gender
         switch self.gender {
@@ -138,9 +157,22 @@ class Toon: LifeSet, SkillSet, FightSet {
         }
     }
 }
+extension Toon {
+
+
+    
+}
+
+
+protocol AllArray {
+    static var All: [Toon] {get set}
+}
 
 // MARK: Daughter : Engineer
-class Engineer: Toon {
+final class Engineer: Toon, AllArray {
+    
+    static var All: [Toon] = [Engineer]()
+
     override init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
         super.init(gender, age, icon, role)
         // Malus = Thermic, Bonus = Kinetic
@@ -153,7 +185,7 @@ class Engineer: Toon {
     }
     
     static func createAll(){
-        var toon: (pic: String, job: String)
+        var toon: (pic: String, title: String)
         var basic: (pic: String, name: String)
         var updated: (pic: String, name: String)
         for age in Age.allCases {
@@ -161,27 +193,32 @@ class Engineer: Toon {
                 switch age {
                 case .isJunior:
                     toon = (gender == Gender.isMan ? "👨‍🔧" : "👩‍🔧",  "YoungMeccano")
-                    basic = ("🔧", "French Wrench")
-                    updated = ("⚙️", "Chew Screw")
+                    basic = ("🔧", "BloodStench Wrench")
+                    updated = ("🔩", "ChewThrough Screw")
                 case .isAdult:
                     toon = (gender == Gender.isMan ? "👨‍💻" : "👩‍💻", "MachineCoder")
                     basic = ("💻", "MacPuke Pro") ;
                     updated = ("🖥", "iSmack Pro")
                 case .isSenior:
                     toon = (gender == Gender.isMan ? "👨‍💼" : "👩‍💼", "EmeritusProfessor")
-                    basic = ("📡", "Paralysing Parrabolla")
+                    basic = ("📡", "Parabellum Parrabolla")
                     updated = ("🦾", "Bionic Beef")
                 }
-                let newEngineer: Engineer = Engineer(gender, age, toon.pic, toon.job)
+                let newEngineer: Engineer = Engineer(gender, age, toon.pic, toon.title)
                 newEngineer.tool = KineticWeapon(age, basic.pic, basic.name, updated.pic, updated.name)
-                Toon.All.append(newEngineer)
+                All.append(newEngineer)
             }
         }
     }
 }
 
 // MARK: Daughter : Medical
-class Medical: Toon {
+final class Medical: Toon, AllArray {
+    
+    static var All: [Toon] = [Medical]()
+    
+    let medecineTool = Tool("🩹", "SavageBandage", "💊", "HealPill")
+    
     override init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
         super.init(gender, age, icon, role)
         // Malus = Kinetic, Bonus = Biologic
@@ -194,7 +231,7 @@ class Medical: Toon {
     }
     
     static func createAll(){
-        var toon: (pic: String, job: String)
+        var toon: (pic: String, title: String)
         var basic: (pic: String, name: String)
         var updated: (pic: String, name: String)
         for age in Age.allCases {
@@ -213,16 +250,19 @@ class Medical: Toon {
                     basic = ("🧪", "Secret Substance")
                     updated = ("🧬", "Dna Denaturator")
                 }
-                let newEngineer: Engineer = Engineer(gender, age, toon.pic, toon.job)
-                newEngineer.tool = BiologicWeapon(age, basic.pic, basic.name, updated.pic, updated.name)
-                Toon.All.append(newEngineer)
+                let newMedical: Medical = Medical(gender, age, toon.pic, toon.title)
+                newMedical.tool = BiologicWeapon(age, basic.pic, basic.name, updated.pic, updated.name)
+                All.append(newMedical)
             }
         }
     }
 }
 
 // MARK: Daughter : Military
-class Military: Toon {
+final class Military: Toon, AllArray {
+    
+    static var All: [Toon] = [Military]()
+    
     override init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
         super.init(gender, age, icon, role)
         // Malus = Biologic, Bonus = Thermic
@@ -235,7 +275,7 @@ class Military: Toon {
     }
     
     static func createAll(){
-        var toon: (pic: String, job: String)
+        var toon: (pic: String, title: String)
         var basic: (pic: String, name: String)
         var updated: (pic: String, name: String)
         for age in Age.allCases {
@@ -243,20 +283,20 @@ class Military: Toon {
                 switch age {
                 case .isJunior:
                     toon = (gender == Gender.isMan ? "👨‍🚒" : "👩‍🚒",  "FireFighter")
-                    basic = ("🧯", "Poisoned Popcorn")
+                    basic = ("🪓", "Hashing Hatchet")
                     updated = ("🧨", "Dynamic Dynamite")
                 case .isAdult:
                     toon = (gender == Gender.isMan ? "👮‍♂️" : "👮‍♀️", "HighCommander")
-                    basic = ("🔫", "Green Gun") ;
+                    basic = ("🔫", "GreenSight Gun") ;
                     updated = ("💣", "Dirty Detonator")
                 case .isSenior:
                     toon = (gender == Gender.isMan ? "🕵️‍♂️" : "🕵️‍♀️", "SecretService")
                     basic = ("🌂", "Bulgarian Umbrella")
                     updated = ("🕳", "Wicked Weapon")
                 }
-                let newEngineer: Engineer = Engineer(gender, age, toon.pic, toon.job)
-                newEngineer.tool = ThermicWeapon(age, basic.pic, basic.name, updated.pic, updated.name)
-                Toon.All.append(newEngineer)
+                let newMilitary: Military = Military(gender, age, toon.pic, toon.title)
+                newMilitary.tool = ThermicWeapon(age, basic.pic, basic.name, updated.pic, updated.name)
+                All.append(newMilitary)
             }
         }
     }

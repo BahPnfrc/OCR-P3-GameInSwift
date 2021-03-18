@@ -15,6 +15,6 @@ Engineer.createAll()
 Medical.createAll()
 Military.createAll()
 
-let see = Toon.All
 let game = Game()
+game.run()
 
