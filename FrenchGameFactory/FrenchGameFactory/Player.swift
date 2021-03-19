@@ -65,9 +65,6 @@ final class Human: Player { // COM
 // MARK: Machine class
 final class Machine: Player {
     
-    enum Level { case easy, medium, hard }
-    var level: Level = .medium
-    
     private static let randomNames: [String] = [String]() //
     private static var randomName: String {
             Machine.randomNames.count > 0 ?

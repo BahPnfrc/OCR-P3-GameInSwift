@@ -16,5 +16,5 @@ Medical.createAll()
 Military.createAll()
 
 let game = Game()
-game.run()
+game.thenRun()
 

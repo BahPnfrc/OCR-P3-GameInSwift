@@ -79,7 +79,7 @@ class ConsoleIO {
     
     // MARK: String input
     private static func promptForStringInput(_ required: String) {
-        ConsoleIO.write("Type \(required) now and press 'Enter' to confirm")
+        ConsoleIO.write("Type \(required) and press 'Enter' to confirm")
     }
     private static func contentCheck(content string: String, check charactereSet: CharacterSet) -> Bool {
         let range = string.rangeOfCharacter(from: charactereSet)

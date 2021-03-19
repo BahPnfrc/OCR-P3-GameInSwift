@@ -8,12 +8,15 @@
 import Foundation
 
 enum Mode: CaseIterable { case isVersusHuman, isVersusMachine }
+enum Level: CaseIterable { case isDefault, easy, medium, hard }
 
 class Game {
     
     var mode: Mode
+    var level: Level = .isDefault
+    
     var player: (main: Player, second: Player)
-
+    
     init(){
         // MARK: A - MODE
         ConsoleIO.write("""
@@ -37,9 +40,9 @@ class Game {
         case .isVersusMachine:
             
             // MARK: D - LEVEL
-            let machine = Machine()
+            player.second = Machine() as Player
             ConsoleIO.write("""
-                Ok \(player.main.name), I'm \(machine.name) and I'm your opponent !
+                Ok \(player.main.name), I'm \(player.second.name) and I'm your opponent !
 
                 Choose my level :
                 1. Easy : Because you're soft and delicate
@@ -47,28 +50,28 @@ class Game {
                 3. Hard : Can't fight the dust
                 """)
             let levelPrompt: Int = ConsoleIO.getIntInput(fromTo: 1...3)
-            machine.level =
+            level =
                 levelPrompt == 1 ? .easy:
                 levelPrompt == 2 ? .medium:
                 .hard
-            player.second = machine
         }
     }
     
     func thenRun(){
         // MARK: E - CHOOSE TOONS
-        let header = (main: """
+        let header = (
+            main: """
             Ok \(player.main.name), time is to choose your toons.
             You must pick one Engineer, one Military and one Medical.
-            """, second: "OK, \(player.second.name), it's your turn now.")
+            """,
+            second: "OK, \(player.second.name), it's your turn now.")
         pickToons(for: player.main, withHeader: header.main)
         
         if self.mode == .isVersusHuman {
             pickToons(for: player.second, withHeader: header.second)
         } else {
-            machinePickToon() // COMPLETER
+            machinePickToons() // COMPLETER
         }
-        
     }
     
     private func pickToons(for player: Player, withHeader header: String){
@@ -83,7 +86,7 @@ class Game {
             for toon in toonType.array {
                 ConsoleIO.write(toon.getPresentation())
             }
-            // Choose a toon buy its ID
+            // Choose a toon by its ID
             let promptForNumber: Int = ConsoleIO.getIntInput(fromTo: 1...toonType.array.count)
             let chosenToon: Toon = toonType.array.first(where: {$0.ID == promptForNumber})!
             // Choose a name for this toon
@@ -92,7 +95,33 @@ class Game {
             player.toons.append(chosenToon)
         }
     }
-    private func machinePickToon() {
+    private func machinePickToons() {
+        
+        var currentID : Int ; var currentScore: Double
+        var results: [(ID: Int, score: Double)] = []
+        
+        let toonTypes = [Engineer.All, Military.All, Medical.All]
+        for toonType in toonTypes { // For a given type of Toon
+            for toon in toonType { // Go throught each toon
+                (currentID, currentScore) = (toon.ID, toon.averageSet) // Get its ID and score
+                results.append((ID: currentID, score: currentScore)) // And add it to results
+            }
+            switch level { // According to level
+            case .easy:
+                results.sort { $0.score < $1.score } // Put lowest score first
+            case .hard:
+                results.sort { $0.score > $1.score } // Sort results from best to lowest
+            default:
+                results.shuffle() // Sort result by chance
+            }
+            
+            for index in 0...2 { // For first index of results
+                let requestedID: Int = results[index].ID
+                let rightToon = toonType.first(where: {$0.ID == requestedID} )!
+                rightToon.name = "RANDOMNAME"
+                player.second.toons.append(rightToon)
+            }
+        }
         
     }
     
@@ -112,9 +141,9 @@ class Game {
 
         let givenDamage: Double = (biologicDamage + kineticDamage + thermicDamage)
             * attacker.getStrenght() / defender.getAgility()
-            * attacker.getAccuracy() / defender.getExperience()
+            * attacker.getAccuracy() / defender.getForsight()
         
-        let expectedDamage = tool.isUpdated == true ?
+        let expectedDamage = attacker.tool!.isUpdated == true ?
             Setting.Tool.expectedUpdatedDamage : Setting.Tool.expectedBasicDamage
         
         let (action, result) =

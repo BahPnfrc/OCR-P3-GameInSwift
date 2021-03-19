@@ -10,8 +10,8 @@ import Foundation
 // MARK: Protocols
 protocol ProfilSet {
     var isUpdated: Bool {get set}
-    var pic: (basic: String, updated: String) {get}
-    var name: (basic: String, updated: String) {get}
+    var pic: String {get}
+    var name: String {get}
 }
 protocol DamageSet {
     var damageSet:(
@@ -26,17 +26,11 @@ class Tool: ProfilSet, DamageSet{
     
     // PROFIL SET
     var isUpdated: Bool = false
-    internal let pic: (basic: String, updated: String)
-    internal let name: (basic: String, updated: String)
-    
-    func getPic() -> String {
-        isUpdated == true ? pic.updated : pic.basic
-    }
-    func getName() -> String {
-        isUpdated == true ? name.updated : name.basic
-    }
+    let pic: String
+    let name: String
+
     func getPicWithName() -> String {
-        getPic() + " " + getName()
+        self.pic + " " + self.name
     }
     
     // DAMAGE SET
@@ -67,12 +61,9 @@ class Tool: ProfilSet, DamageSet{
             modifier.forSenior
     }
     
-    init (_ basicPic: String,
-          _ basicName: String,
-          _ updatedPic: String,
-          _ updatedName: String) {
-        self.name = (basicName, updatedName)
-        self.pic = (basicPic, updatedPic)
+    init (_ pic: String,
+          _ name: String) {
+        (self.pic, self.name)  = (pic, name)
     }
 }
 
@@ -82,12 +73,9 @@ class BiologicWeapon: Tool {
     static let extraModifier = Setting.Tool.biologicWeaponAgeExtraModifier
     
     init(_ age: Age,
-         _ basicPic: String,
-         _ basicName: String,
-         _ updatedPic: String,
-         _ updatedName: String) {
-        
-        super.init(basicPic, basicName, updatedPic, updatedName)
+         _ pic: String,
+         _ name: String) {
+        super.init(pic, name)
     
         let byThisValue: Double = Tool.getAgeExtraModifier(age, BiologicWeapon.extraModifier)
         if byThisValue != 1 {
@@ -103,13 +91,10 @@ class KineticWeapon: Tool {
     static let extraModifier = Setting.Tool.kineticWeaponAgeExtraModifier
     
     init(_ age: Age,
-         _ basicPic: String,
-         _ basicName: String,
-         _ updatedPic: String,
-         _ updatedName: String) {
+         _ pic: String,
+         _ name: String) {
+        super.init(pic, name)
         
-        super.init(basicPic, basicName, updatedPic, updatedName)
-    
         let byThisValue: Double = Tool.getAgeExtraModifier(age, KineticWeapon.extraModifier)
         if byThisValue != 1 {
             self.damageSet.kinetic.basic *= byThisValue
@@ -124,13 +109,10 @@ class ThermicWeapon: Tool {
     static let extraModifier = Setting.Tool.thermicWeaponAgeExtraModifier
     
     init(_ age: Age,
-         _ basicPic: String,
-         _ basicName: String,
-         _ updatedPic: String,
-         _ updatedName: String) {
+         _ pic: String,
+         _ name: String) {
+        super.init(pic, name)
         
-        super.init(basicPic, basicName, updatedPic, updatedName)
-    
         let byThisValue: Double = Tool.getAgeExtraModifier(age, ThermicWeapon.extraModifier)
         if byThisValue != 1 {
             self.damageSet.thermic.basic *= byThisValue
