@@ -19,29 +19,29 @@ class Game {
     
     init(){
         // MARK: A - MODE
-        ConsoleIO.write("""
+        Console.write("""
             WELCOME TO THE GAME
             How do you want to play ?
             1. Against a friend
             2. Against the machine
             """)
-        let modePrompt:Int = ConsoleIO.getIntInput(fromTo: 1...2)
+        let modePrompt:Int = Console.getIntInput(fromTo: 1...2)
         mode = modePrompt == 1 ? .isVersusHuman: .isVersusMachine
         
         // MARK: B - MAIN PLAYER
-        let mainNamePrompt: String = ConsoleIO.getStringInput(prompt: "your name")
+        let mainNamePrompt: String = Console.getStringInput(prompt: "your name")
         player.main = Human(mainNamePrompt) as Player
         
         // MARK: C - SECOND PLAYER
         switch mode {
         case .isVersusHuman:
-            let secondNamePrompt = ConsoleIO.getStringInput(prompt: "the other player's name")
+            let secondNamePrompt = Console.getStringInput(prompt: "the other player's name")
             player.second = Human(secondNamePrompt) as Player
         case .isVersusMachine:
             
             // MARK: D - LEVEL
             player.second = Machine() as Player
-            ConsoleIO.write("""
+            Console.write("""
                 Ok \(player.main.name), I'm \(player.second.name) and I'm your opponent !
 
                 Choose my level :
@@ -49,7 +49,7 @@ class Game {
                 2. Medium : Real one on one baby
                 3. Hard : Can't fight the dust
                 """)
-            let levelPrompt: Int = ConsoleIO.getIntInput(fromTo: 1...3)
+            let levelPrompt: Int = Console.getIntInput(fromTo: 1...3)
             level =
                 levelPrompt == 1 ? .easy:
                 levelPrompt == 2 ? .medium:
@@ -75,22 +75,22 @@ class Game {
     }
     
     private func pickToons(for player: Player, withHeader header: String){
-        ConsoleIO.write(header)
+        Console.write(header)
         let toonTypes = [
              (array: Engineer.All, message: "There it goes all Engineers :"),
              (array: Military.All, message: "Time is to pick up a Military now :"),
              (array: Medical.All, message: "You can finally pick up your Medical :")]
         for toonType in toonTypes {
-            ConsoleIO.write(toonType.message)
+            Console.write(toonType.message)
             // List all toons
             for toon in toonType.array {
-                ConsoleIO.write(toon.getPresentation())
+                Console.write(toon.getPresentation())
             }
             // Choose a toon by its ID
-            let promptForNumber: Int = ConsoleIO.getIntInput(fromTo: 1...toonType.array.count)
+            let promptForNumber: Int = Console.getIntInput(fromTo: 1...toonType.array.count)
             let chosenToon: Toon = toonType.array.first(where: {$0.ID == promptForNumber})!
             // Choose a name for this toon
-            let promptForName: String = ConsoleIO.getStringInput(prompt: "a name for this toon")
+            let promptForName: String = Console.getStringInput(prompt: "a name for this toon")
             chosenToon.name = promptForName
             player.toons.append(chosenToon)
         }
@@ -103,7 +103,7 @@ class Game {
         let toonTypes = [Engineer.All, Military.All, Medical.All]
         for toonType in toonTypes { // For a given type of Toon
             for toon in toonType { // Go throught each toon
-                (currentID, currentScore) = (toon.ID, toon.averageSet) // Get its ID and score
+                (currentID, currentScore) = (toon.ID, toon.globalSet) // Get its ID and score
                 results.append((ID: currentID, score: currentScore)) // And add it to results
             }
             switch level { // According to level

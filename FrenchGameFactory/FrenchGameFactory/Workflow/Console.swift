@@ -9,8 +9,7 @@
 
 import Foundation
 
-
-class ConsoleIO {
+class Console {
     
     // Upon running a program the path to its executable is passed as argument[0]
     // Argument[0] is accessible through the global CommandLine enum
@@ -54,7 +53,7 @@ class ConsoleIO {
     
     // MARK: Int input
     private static func promptForIntInput(_ range: ClosedRange<Int>) {
-        ConsoleIO.write("Type a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' to confirm")
+        Console.write("Type a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' to confirm")
     }
     static func getIntInput(fromTo range: ClosedRange<Int>) -> Int {
         repeat {
@@ -62,16 +61,16 @@ class ConsoleIO {
             do {
                 let rawInput = try getRawInput()
                 guard let intInput: Int = Int(rawInput) else {
-                    ConsoleIO.write("No number was found : consider retrying", to: .standard)
+                    Console.write("No number was found : consider retrying", to: .standard)
                     continue
                 }
                 guard range.contains(intInput) else {
-                    ConsoleIO.write("\(intInput) is not expected : consider retrying", to: .standard)
+                    Console.write("\(intInput) is not expected : consider retrying", to: .standard)
                     continue
                 }
                 return intInput
             } catch {
-                ConsoleIO.write("No input was found : consider retrying", to: .error)
+                Console.write("No input was found : consider retrying", to: .error)
                 continue
             }
         } while true
@@ -79,7 +78,7 @@ class ConsoleIO {
     
     // MARK: String input
     private static func promptForStringInput(_ required: String) {
-        ConsoleIO.write("Type \(required) and press 'Enter' to confirm")
+        Console.write("Type \(required) and press 'Enter' to confirm")
     }
     private static func contentCheck(content string: String, check charactereSet: CharacterSet) -> Bool {
         let range = string.rangeOfCharacter(from: charactereSet)
@@ -94,16 +93,16 @@ class ConsoleIO {
             do {
                 let stringInput = try getRawInput()
                 if !allowSpace && contentCheck(content: stringInput, check: .whitespaces) {
-                    ConsoleIO.write("No space is allowed : consider retrying", to: .standard)
+                    Console.write("No space is allowed : consider retrying", to: .standard)
                     continue
                 }
                 if !allowDigit && contentCheck(content: stringInput, check: .decimalDigits) {
-                    ConsoleIO.write("No digit is allowed : consider retrying", to: .standard)
+                    Console.write("No digit is allowed : consider retrying", to: .standard)
                     continue
                 }
                 return stringInput
             } catch {
-                ConsoleIO.write("No input was found : consider retrying", to: .error)
+                Console.write("No input was found : consider retrying", to: .error)
                 continue
             }
         } while true

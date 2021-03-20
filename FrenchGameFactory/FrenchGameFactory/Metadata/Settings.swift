@@ -7,11 +7,12 @@
 
 import Foundation
 
-
 class Setting {
     
     class Toon {
-        
+        static let defaultLifeSet: (hitpoints: Int, isSick: Bool) = (1000, false)
+        static let defaultSkillSet: Double = 1.0
+        static let defaultFightSet: (defense: Double, attack: Double) = (1.0, 1.0)
     }
     
     class Tool {
