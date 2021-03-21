@@ -170,14 +170,39 @@ extension Toon { //
         }
         return pic + " " + title + " " + name
     }
-    func getPresentation() -> String {
+    func getChoosePrompt() -> String {
         let name: String = String(ID) + ". " +  getPicWithName() + " " + gender.rawValue
         let age: String = "A " + self.age.rawValue
         let tool: String = "armed with " + getHisOrHer() + self.tool!.getPicWithName()
         return name + " : " + age + " " + tool
     }
+    func getFightPrompt() -> String {
+        let name : String = String(ID) + ". " + getPicWithName()
+        let tool : String = self.tool!.getPicWithName()
+        let life : String = _getlifeBar()
+        return name + " " + tool + "\n" + life
+    }
+    private func _getlifeBar() -> String {
+        let totalHP = Setting.Toon.defaultLifeSet.hitpoints
+        let leftHP = self.lifeSet.hitpoints
+        var percentLeft: Int = Int(100 / totalHP * leftHP)
+        let percentAsString = " " + String(percentLeft) + "%"
+        let model: [String] = "🟥,🟥,🟧,🟧,🟨,🟨,🟩,🟩,🟩,🟩".components(separatedBy: ",")
+        var lifeBar: String = ""
+        for currentIndex in 0...model.count {
+            if percentLeft > 9 {
+                lifeBar.append(model[currentIndex])
+                percentLeft -= 10
+            } else { lifeBar.append("⬜️")}
+        }
+        return lifeBar + percentAsString
+    }
+    
+    
+    
     
 }
+
 // MARK: Extension : Random Name
 extension Toon {
    

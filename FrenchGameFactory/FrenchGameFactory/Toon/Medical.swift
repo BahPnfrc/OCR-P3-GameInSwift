@@ -16,10 +16,6 @@ final class Medical: Toon {
         return Medical.newID
     }
     
-    let lightMedicine = Tool("🩹", "Savage Bandage")
-    let mediumMedicine = Tool("💊", "Precision Pill")
-    let heavyMedicine = Tool("🦠", "Miraculous Virus")
-    
     init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
         super.init(Medical.getNewID(), gender, age, icon, role)
         // Malus = Kinetic, Bonus = Biologic
@@ -49,7 +45,7 @@ final class Medical: Toon {
                 case (.isSenior, .isMan):
                     toon = ("👨‍🔬", "NobelPrice") ; tool = ("🧪", "Secret Substance")
                 case (.isSenior, .isWoman):
-                    toon = ("👩‍🔬", "NobelPrice") ; tool = ("🧬", "Dna Denaturator")
+                    toon = ("👩‍🔬", "NobelPrice") ; tool = ("🦠", "Vicious Virus")
             }
             let newMedical: Medical = Medical(gender, age, toon.pic, toon.title)
             newMedical.tool = BiologicWeapon(age, tool.pic, tool.name)

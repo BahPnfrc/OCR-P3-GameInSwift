@@ -39,7 +39,7 @@ final class Military: Toon {
                 case (.isJunior, .isWoman):
                     toon = ("👩‍🚒", "FireFighter") ; tool = ("🧨", "Dynamic Dynamite")
                 case (.isAdult, .isMan):
-                    toon = ("👮‍♂️", "HighCommander") ; tool = ("🔫", "GreenSight Gun")
+                    toon = ("👮‍♂️", "HighCommander") ; tool = ("🔫", "GreenGrut Gun")
                 case (.isAdult, .isWoman):
                     toon = ("👮‍♀️", "HighCommander") ; tool = ("💣", "Dirty Detonator")
                 case (.isSenior, .isMan):

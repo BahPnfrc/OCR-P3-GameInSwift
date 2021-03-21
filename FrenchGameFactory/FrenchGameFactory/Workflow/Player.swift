@@ -10,21 +10,16 @@ import Foundation
 // MARK: Mother class
 class Player {
     
-    // Static
-    static var All: [Player] = [Player]()
-    
     private static var newID: Int = 0
     private static func GetNewID() -> Int {
         Player.newID += 1
         return Player.newID
     }
     
-    // Properties
     var ID: Int
     var name: String
     var toons: [Toon] = [Toon]()
         
-    // Init
     init(named name: String) {
         self.name = name
         self.ID = Player.GetNewID()
@@ -41,7 +36,7 @@ final class Human: Player { // COM
 // MARK: Machine class
 final class Machine: Player {
     
-    private static let randomNames: [String] = [String]() //
+    private static let randomNames: [String] = []
     private static var randomName: String {
             Machine.randomNames.count > 0 ?
             Machine.randomNames.randomElement()!:

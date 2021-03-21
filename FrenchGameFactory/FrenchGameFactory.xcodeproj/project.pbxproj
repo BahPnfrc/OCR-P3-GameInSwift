@@ -10,6 +10,8 @@
 		0B296D182605E924006AA880 /* Medical.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D172605E924006AA880 /* Medical.swift */; };
 		0B296D1C2605E94B006AA880 /* Military.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D1B2605E94B006AA880 /* Military.swift */; };
 		0B296D1F2605E986006AA880 /* Engineer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D1E2605E986006AA880 /* Engineer.swift */; };
+		0B296D282608043A006AA880 /* Medicine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D272608043A006AA880 /* Medicine.swift */; };
+		0B296D2C26080521006AA880 /* Weapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D2B26080521006AA880 /* Weapon.swift */; };
 		0B9062EE25EE99FB00F7E328 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062ED25EE99FB00F7E328 /* main.swift */; };
 		0B9062F625EEA17F00F7E328 /* Console.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062F525EEA17F00F7E328 /* Console.swift */; };
 		0B9062F925F116FD00F7E328 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062F825F116FD00F7E328 /* Game.swift */; };
@@ -37,6 +39,8 @@
 		0B296D172605E924006AA880 /* Medical.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Medical.swift; sourceTree = "<group>"; };
 		0B296D1B2605E94B006AA880 /* Military.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Military.swift; sourceTree = "<group>"; };
 		0B296D1E2605E986006AA880 /* Engineer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engineer.swift; sourceTree = "<group>"; };
+		0B296D272608043A006AA880 /* Medicine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Medicine.swift; sourceTree = "<group>"; };
+		0B296D2B26080521006AA880 /* Weapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weapon.swift; sourceTree = "<group>"; };
 		0B9062EA25EE99FB00F7E328 /* FrenchGameFactory */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FrenchGameFactory; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B9062ED25EE99FB00F7E328 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		0B9062F525EEA17F00F7E328 /* Console.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Console.swift; sourceTree = "<group>"; };
@@ -84,9 +88,20 @@
 			isa = PBXGroup;
 			children = (
 				0B9062F525EEA17F00F7E328 /* Console.swift */,
+				0BE46A1E25F420430073884F /* Player.swift */,
 				0B9062F825F116FD00F7E328 /* Game.swift */,
 			);
 			path = Workflow;
+			sourceTree = "<group>";
+		};
+		0B296D2626080414006AA880 /* Tool */ = {
+			isa = PBXGroup;
+			children = (
+				0BE46A1B25F2D96E0073884F /* Tool.swift */,
+				0B296D2B26080521006AA880 /* Weapon.swift */,
+				0B296D272608043A006AA880 /* Medicine.swift */,
+			);
+			path = Tool;
 			sourceTree = "<group>";
 		};
 		0B9062E125EE99FB00F7E328 = {
@@ -112,9 +127,8 @@
 				0B296D232605F6E0006AA880 /* Workflow */,
 				0B296D222605F64C006AA880 /* Metadata */,
 				0B296D162605E8F5006AA880 /* Toon */,
-				0BE46A1B25F2D96E0073884F /* Tool.swift */,
+				0B296D2626080414006AA880 /* Tool */,
 				0BB302C325FD2B33005C424F /* Toto.swift */,
-				0BE46A1E25F420430073884F /* Player.swift */,
 			);
 			path = FrenchGameFactory;
 			sourceTree = "<group>";
@@ -177,7 +191,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B9062EE25EE99FB00F7E328 /* main.swift in Sources */,
+				0B296D282608043A006AA880 /* Medicine.swift in Sources */,
 				0BE46A1925F2D51D0073884F /* Toon.swift in Sources */,
+				0B296D2C26080521006AA880 /* Weapon.swift in Sources */,
 				0BB302BE25FBBAD0005C424F /* Settings.swift in Sources */,
 				0BB302C425FD2B33005C424F /* Toto.swift in Sources */,
 				0B9062F925F116FD00F7E328 /* Game.swift in Sources */,

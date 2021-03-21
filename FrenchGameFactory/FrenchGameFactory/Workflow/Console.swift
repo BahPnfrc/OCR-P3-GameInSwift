@@ -97,16 +97,16 @@ class Console {
             do {
                 let stringInput = try getRawInput()
                 if !allowSpace && contentCheck(content: stringInput, check: .whitespaces) {
-                    Console.write("No space is allowed : consider retrying", to: .standard, "🟠")
+                    Console.write("No space is allowed : consider retrying", to: .standard)
                     continue
                 }
                 if !allowDigit && contentCheck(content: stringInput, check: .decimalDigits) {
-                    Console.write("No digit is allowed : consider retrying", to: .standard, "🟠")
+                    Console.write("No digit is allowed : consider retrying", to: .standard)
                     continue
                 }
                 return stringInput
             } catch {
-                Console.write("No input was found : consider retrying", to: .error, "🔴")
+                Console.write("No input was found : consider retrying", to: .error)
                 continue
             }
         } while true

@@ -90,7 +90,7 @@ extension Game {
         for toonType in toonTypes { // For each type of toon
             // A - Show message and list all toons
             Console.write(toonType.message)
-            for toon in toonType.all { Console.write(toon.getPresentation()) }
+            for toon in toonType.all { Console.write(toon.getChoosePrompt()) }
             // B - Prompt to choose a toon by its ID
             let promptForNumber: Int = Console.getIntInput(fromTo: 1...toonType.all.count)
             let chosenToon: Toon = toonType.all.first(where: {$0.ID == promptForNumber})!
@@ -115,14 +115,14 @@ extension Game {
             switch level {
             case .easy: results.sort { $0.score < $1.score } // Put lowest score on top
             case .hard: results.sort { $0.score > $1.score } // Put highest score on top
-            default: results.shuffle() // Sort result with shuffle
+            default: results.shuffle() // Simple shuffle
             }
             // C - Pick toons at the top of the array
             let requestedID: Int = results[0].ID
             let rightToon = toonType.first(where: {$0.ID == requestedID} )!
             rightToon.name = rightToon.getRandomName()
             player.second.toons.append(rightToon)
-            results.removeAll()
+            results.removeAll() // For next loop
         }
     }
     
@@ -132,29 +132,68 @@ extension Game {
 extension Game {
     
     private func fight() {
+        
+        fightResetToonsID()
+        var round: Int = 0
         //getOrder()
         
         var players = [player.main, player.second]
         repeat {
-            let currentPlayer = players[0]
-            Console.write("OK \(currentPlayer.name), select a toon of your team :")
-            for index in 0...currentPlayer.toons.count { // For each toon left
-                currentPlayer.toons[index].ID = index + 1 // Reset its prompt counter
-            }
-            for toon in currentPlayer.toons {
-                if toon.lifeSet.hitpoints > 0 {toon.getPresentation()}
-            }
+            round += 1
+            // A - Pick one player
+            let (attacker, defender) = (players[0], players[1]) // Get the first player
+            players.swapAt(0, 1) // Swap for the next round
+            // B - Lists all toons
+            fightListToons(of: attacker, with: "OK \(attacker.name), pick your champion :")
+            // C - Choose one toon
+            let choosenToon: Toon = fightPickToon(of: attacker)
+            // D - Heal
+            let usedHeal: Bool = fightDoMedicine(of: attacker, with: choosenToon)
+            if usedHeal { break }
             
-            let promptForNumber: Int = Console.getIntInput(fromTo: 1...currentPlayer.toons.count)
-            let attacker: Toon = toonType.all.first(where: {$0.ID == promptForNumber})!
-            
-            
-            
-            players.swapAt(0, 1)
-        } while gameCanContinue()
+        } while fightCanContinue()
     }
     
-    private func gameCanContinue() -> Bool {
+
+    private func fightResetToonsID() {
+        for player in ([player.main, player.second]) { // For each player
+            for index in 0...player.toons.count {
+                player.toons[index].ID = index + 1
+            }
+        }
+    }
+    private func fightListToons(of player: Player, with header: String) {
+        Console.write(header)
+        for currentToon in player.toons {
+            Console.write(currentToon.getFightPrompt())
+        }
+    }
+    private func fightPickToon(of player: Player) -> Toon {
+        while true {
+            let promptForNumber = Console.getIntInput(fromTo: 1...player.toons.count)
+            let choosenToon = player.toons.first(where: { $0.ID == promptForNumber })!
+            if !choosenToon.isAlive() {
+                Console.write(choosenToon.getPicWithName() + " can't fight anymore")
+            } else { return choosenToon }
+        }
+    }
+    private func fightDoMedicine(of player: Player, with choosenToon: Toon) -> Bool {
+        guard let doctor = choosenToon as? Medical else {
+           return false
+        }
+        Console.write("""
+            What do you want to do with \(doctor.name!) ?
+            1. bring medical help to my team
+            2. \(doctor.tool!.pic) Blow the enemy to smithereens
+            """)
+        let promptForNumber = Console.getIntInput(fromTo: 1...2)
+        
+        
+        return true
+        
+        
+    }
+    private func fightCanContinue() -> Bool {
         for player in ([player.main, player.second]) { // For each player
             if !player.toons.allSatisfy({ $0.lifeSet.hitpoints == 0 }) {
                 return true // Continue
