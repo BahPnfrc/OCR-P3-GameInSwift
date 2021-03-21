@@ -23,30 +23,6 @@ class Player {
     var ID: Int
     var name: String
     var toons: [Toon] = [Toon]()
-    
-    
-    // https://www.behindthename.com/top/lists/france/1900
-    private static var defaultNameForMan: [(Bool, String)] =
-        [(isUsed: false, name: ""),
-         (isUsed: false, name: ""),
-         (isUsed: false, name: ""),
-         (isUsed: false, name: ""),
-         (isUsed: false, name: ""),
-         (isUsed: false, name: ""),
-         (isUsed: false, name: ""),
-         (isUsed: false, name: ""),
-         (isUsed: false, name: "")]
-    // https://www.behindthename.com/top/lists/france/1900
-    private static var defaultnameForWoman: [(Bool, String)] =
-        [(isUsed: false, name: "Evodie"),
-         (isUsed: false, name: "Rejane"),
-         (isUsed: false, name: "Vitaline"),
-         (isUsed: false, name: "Nonce"),
-         (isUsed: false, name: "Toussine"),
-         (isUsed: false, name: "Firmine"),
-         (isUsed: false, name: "Gratienne"),
-         (isUsed: false, name: "Renelle"),
-         (isUsed: false, name: "Zilda")]
         
     // Init
     init(named name: String) {

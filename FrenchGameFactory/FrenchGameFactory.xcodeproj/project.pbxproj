@@ -109,8 +109,8 @@
 			isa = PBXGroup;
 			children = (
 				0B9062ED25EE99FB00F7E328 /* main.swift */,
-				0B296D222605F64C006AA880 /* Metadata */,
 				0B296D232605F6E0006AA880 /* Workflow */,
+				0B296D222605F64C006AA880 /* Metadata */,
 				0B296D162605E8F5006AA880 /* Toon */,
 				0BE46A1B25F2D96E0073884F /* Tool.swift */,
 				0BB302C325FD2B33005C424F /* Toto.swift */,

@@ -20,7 +20,7 @@ class Console {
     static func write(
         _ message: String,
         to: OutputType = .standard,
-        with header: String? = nil) {
+        _ header: String? = nil) {
       switch to {
         case .standard:
             // Uses the regular Swift print() function
@@ -32,7 +32,7 @@ class Console {
         case .error:
             // Uses the C function fputs to write to stderr
             // Stderr is a global variable and points to the standard error stream
-            fputs("Error : " + message, stderr)
+            fputs("[Error] " + message + "\n", stderr)
       }
     }
     
@@ -45,10 +45,14 @@ class Console {
     
     // MARK: Raw input
     private static func getRawInput() throws -> String {
-        guard let rawInput: String = readLine() else{
+        guard var rawInput: String = readLine() else{
             throw InputError.noInput()
         }
-        return rawInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        rawInput = rawInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        if rawInput.count < 1 {
+            throw InputError.noInput()
+        }
+        return rawInput
     }
     
     // MARK: Int input
@@ -65,7 +69,7 @@ class Console {
                     continue
                 }
                 guard range.contains(intInput) else {
-                    Console.write("\(intInput) is not expected : consider retrying", to: .standard)
+                    Console.write("\(intInput) is not in range : consider retrying", to: .standard)
                     continue
                 }
                 return intInput
@@ -78,7 +82,7 @@ class Console {
     
     // MARK: String input
     private static func promptForStringInput(_ required: String) {
-        Console.write("Type \(required) and press 'Enter' to confirm")
+        Console.write("\nType \(required) and press 'Enter' to confirm")
     }
     private static func contentCheck(content string: String, check charactereSet: CharacterSet) -> Bool {
         let range = string.rangeOfCharacter(from: charactereSet)
@@ -93,16 +97,16 @@ class Console {
             do {
                 let stringInput = try getRawInput()
                 if !allowSpace && contentCheck(content: stringInput, check: .whitespaces) {
-                    Console.write("No space is allowed : consider retrying", to: .standard)
+                    Console.write("No space is allowed : consider retrying", to: .standard, "🟠")
                     continue
                 }
                 if !allowDigit && contentCheck(content: stringInput, check: .decimalDigits) {
-                    Console.write("No digit is allowed : consider retrying", to: .standard)
+                    Console.write("No digit is allowed : consider retrying", to: .standard, "🟠")
                     continue
                 }
                 return stringInput
             } catch {
-                Console.write("No input was found : consider retrying", to: .error)
+                Console.write("No input was found : consider retrying", to: .error, "🔴")
                 continue
             }
         } while true

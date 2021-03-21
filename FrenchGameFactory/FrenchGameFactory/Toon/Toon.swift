@@ -157,6 +157,7 @@ class Toon: LifeSet, SkillSet, FightSet {
 }
 // MARK: Extension : Retrieve data
 extension Toon { //
+    
     func getHisOrHer() -> String {
         gender == .isMan ? "his " : "her "
     }
@@ -175,10 +176,39 @@ extension Toon { //
         let tool: String = "armed with " + getHisOrHer() + self.tool!.getPicWithName()
         return name + " : " + age + " " + tool
     }
+    
+}
+// MARK: Extension : Random Name
+extension Toon {
+   
+    private static var defaultNameForMan: [String] =
+        ["Zenon", "Danton", "Gatien", "Zephir", "Clodomir",
+        "Petrus", "Lazare", "Flavien", "Ovide", "Medard"]
+    
+    private static var defaultnameForWoman: [String] =
+        ["Evodie", "Rejane", "Vitaline", "Nonce", "Toussine",
+         "Firmine", "Peroline", "Gratienne", "Renelle", "Zilda"]
+    
+    func getRandomName() -> String {
+        var randomName: String
+        if self.gender == .isMan {
+            Toon.defaultNameForMan.shuffle()
+            randomName = Toon.defaultNameForMan.first!
+            Toon.defaultNameForMan.removeFirst()
+        } else {
+            Toon.defaultnameForWoman.shuffle()
+            randomName = Toon.defaultnameForWoman.first!
+            Toon.defaultnameForWoman.removeFirst()
+        }
+        return randomName
+    }
+    
 }
 // MARK: Extension : Not used any
 extension Toon {
+    
     static func getRandomPic(_ pics: String) -> String {
        return pics.components(separatedBy: ",").randomElement()!
    }
+    
 }

@@ -17,6 +17,7 @@ class Game {
     
     var player: (main: Player, second: Player)
     
+    
     init(){
         // MARK: A - MODE
         Console.write("""
@@ -57,72 +58,109 @@ class Game {
         }
     }
     
-    func thenRun(){
-        // MARK: E - CHOOSE TOONS
-        let header = (
+    func run(){
+        chooseToons()
+    }
+}
+
+// MARK: E - CHOOSE TOONS
+extension Game {
+    private func chooseToons(){
+        let humanHeader = (
             main: """
             Ok \(player.main.name), time is to choose your toons.
             You must pick one Engineer, one Military and one Medical.
             """,
             second: "OK, \(player.second.name), it's your turn now.")
-        pickToons(for: player.main, withHeader: header.main)
+        humanChoose(withHeader: humanHeader.main, for: player.main)
         
         if self.mode == .isVersusHuman {
-            pickToons(for: player.second, withHeader: header.second)
+            humanChoose(withHeader: humanHeader.second, for: player.second)
         } else {
-            machinePickToons() // COMPLETER
+            let machineHeader = "OK, I'm choosing my toons as well. Let me see..."
+            machineChoose(withHeader: machineHeader)
         }
     }
-    
-    private func pickToons(for player: Player, withHeader header: String){
+    private func humanChoose(withHeader header: String, for player: Player){
         Console.write(header)
         let toonTypes = [
-             (array: Engineer.All, message: "There it goes all Engineers :"),
-             (array: Military.All, message: "Time is to pick up a Military now :"),
-             (array: Medical.All, message: "You can finally pick up your Medical :")]
-        for toonType in toonTypes {
+             (all: Engineer.All, message: "There it goes all Engineers :"),
+             (all: Military.All, message: "Time is to pick up a Military now :"),
+             (all: Medical.All, message: "You can finally pick up your Medical :")]
+        for toonType in toonTypes { // For each type of toon
+            // A - Show message and list all toons
             Console.write(toonType.message)
-            // List all toons
-            for toon in toonType.array {
-                Console.write(toon.getPresentation())
-            }
-            // Choose a toon by its ID
-            let promptForNumber: Int = Console.getIntInput(fromTo: 1...toonType.array.count)
-            let chosenToon: Toon = toonType.array.first(where: {$0.ID == promptForNumber})!
-            // Choose a name for this toon
+            for toon in toonType.all { Console.write(toon.getPresentation()) }
+            // B - Prompt to choose a toon by its ID
+            let promptForNumber: Int = Console.getIntInput(fromTo: 1...toonType.all.count)
+            let chosenToon: Toon = toonType.all.first(where: {$0.ID == promptForNumber})!
+            // C - Prompt to choose a name for this toon
             let promptForName: String = Console.getStringInput(prompt: "a name for this toon")
             chosenToon.name = promptForName
             player.toons.append(chosenToon)
         }
     }
-    private func machinePickToons() {
-        
+    private func machineChoose(withHeader header: String) {
+        Console.write(header)
+        let toonTypes = [Engineer.All, Military.All, Medical.All]
         var currentID : Int ; var currentScore: Double
         var results: [(ID: Int, score: Double)] = []
-        
-        let toonTypes = [Engineer.All, Military.All, Medical.All]
-        for toonType in toonTypes { // For a given type of Toon
-            for toon in toonType { // Go throught each toon
-                (currentID, currentScore) = (toon.ID, toon.globalSet) // Get its ID and score
-                results.append((ID: currentID, score: currentScore)) // And add it to results
+        for toonType in toonTypes { // For each type of toon
+            // A - Copy its score and associated ID to an array
+            for toon in toonType { // For each toon of this type
+                (currentID, currentScore) = (toon.ID, toon.globalSet) // Get ID and score
+                results.append((ID: currentID, score: currentScore)) // Add them to results
             }
-            switch level { // According to level
-            case .easy:
-                results.sort { $0.score < $1.score } // Put lowest score first
-            case .hard:
-                results.sort { $0.score > $1.score } // Sort results from best to lowest
-            default:
-                results.shuffle() // Sort result by chance
+            // B - Order this array according to the level
+            switch level {
+            case .easy: results.sort { $0.score < $1.score } // Put lowest score on top
+            case .hard: results.sort { $0.score > $1.score } // Put highest score on top
+            default: results.shuffle() // Sort result with shuffle
+            }
+            // C - Pick toons at the top of the array
+            let requestedID: Int = results[0].ID
+            let rightToon = toonType.first(where: {$0.ID == requestedID} )!
+            rightToon.name = rightToon.getRandomName()
+            player.second.toons.append(rightToon)
+            results.removeAll()
+        }
+    }
+    
+}
+
+// MARK: F - FIGHT
+extension Game {
+    
+    private func fight() {
+        //getOrder()
+        
+        var players = [player.main, player.second]
+        repeat {
+            let currentPlayer = players[0]
+            Console.write("OK \(currentPlayer.name), select a toon of your team :")
+            for index in 0...currentPlayer.toons.count { // For each toon left
+                currentPlayer.toons[index].ID = index + 1 // Reset its prompt counter
+            }
+            for toon in currentPlayer.toons {
+                if toon.lifeSet.hitpoints > 0 {toon.getPresentation()}
             }
             
-            for index in 0...2 { // For first index of results
-                let requestedID: Int = results[index].ID
-                let rightToon = toonType.first(where: {$0.ID == requestedID} )!
-                rightToon.name = "RANDOMNAME"
-                player.second.toons.append(rightToon)
+            let promptForNumber: Int = Console.getIntInput(fromTo: 1...currentPlayer.toons.count)
+            let attacker: Toon = toonType.all.first(where: {$0.ID == promptForNumber})!
+            
+            
+            
+            players.swapAt(0, 1)
+        } while gameCanContinue()
+    }
+    
+    private func gameCanContinue() -> Bool {
+        for player in ([player.main, player.second]) { // For each player
+            if !player.toons.allSatisfy({ $0.lifeSet.hitpoints == 0 }) {
+                return true // Continue
             }
         }
-        
+        return false // Stop
     }
     
     
