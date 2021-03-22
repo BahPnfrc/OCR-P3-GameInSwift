@@ -20,8 +20,8 @@ class Game {
     
     init(){
         // MARK: A - MODE
-        Console.write("""
-            WELCOME TO THE GAME
+        Console.write(0, 0, "WELCOME TO THE GAME", 0)
+        Console.write(1, 1, """
             How do you want to play ?
             1. Against a friend
             2. Against the machine
@@ -42,13 +42,13 @@ class Game {
             
             // MARK: D - LEVEL
             player.second = Machine() as Player
-            Console.write("""
-                Ok \(player.main.name), I'm \(player.second.name) and I'm your opponent !
-
+            Console.write(1, 0,
+                "Ok \(player.main.name), I'm \(player.second.name) and I'm your opponent !", 0)
+            Console.write(1, 1, """
                 Choose my level :
-                1. Easy : Because you're soft and delicate
-                2. Medium : Real one on one baby
-                3. Hard : Can't fight the dust
+                1. 🌸 Easy : Because you're soft and delicate
+                2. 🏓 Medium : Real one on one baby
+                3. 🪖 Hard : Can't fight the dust
                 """)
             let levelPrompt: Int = Console.getIntInput(fromTo: 1...3)
             level =
@@ -73,6 +73,8 @@ extension Game {
             """,
             second: "OK, \(player.second.name), it's your turn now.")
         humanChoose(withHeader: humanHeader.main, for: player.main)
+        _ = player.main.listAllToons(aliveOnly: false)
+        
         
         if self.mode == .isVersusHuman {
             humanChoose(withHeader: humanHeader.second, for: player.second)
@@ -80,18 +82,20 @@ extension Game {
             let machineHeader = "OK, I'm choosing my toons as well. Let me see..."
             machineChoose(withHeader: machineHeader)
         }
+        _ = player.second.listAllToons(aliveOnly: false)
     }
     private func humanChoose(withHeader header: String, for player: Player){
-        Console.write(header)
+        Console.write(1, 0, header)
         let toonTypes = [
              (all: Engineer.All, message: "There it goes all Engineers :"),
              (all: Military.All, message: "Time is to pick up a Military now :"),
              (all: Medical.All, message: "You can finally pick up your Medical :")]
         for toonType in toonTypes { // For each type of toon
             // A - Show message and list all toons
-            Console.write(toonType.message)
-            for toon in toonType.all { Console.write(toon.getChoosePrompt()) }
+            Console.write(0, 1, toonType.message, 0)
+            for toon in toonType.all { Console.write(0, 1, toon.getFirstPromptInfos(), 0) }
             // B - Prompt to choose a toon by its ID
+            Console.newLign()
             let promptForNumber: Int = Console.getIntInput(fromTo: 1...toonType.all.count)
             let chosenToon: Toon = toonType.all.first(where: {$0.ID == promptForNumber})!
             // C - Prompt to choose a name for this toon
@@ -101,7 +105,7 @@ extension Game {
         }
     }
     private func machineChoose(withHeader header: String) {
-        Console.write(header)
+        Console.write(0, 0, header)
         let toonTypes = [Engineer.All, Military.All, Medical.All]
         var currentID : Int ; var currentScore: Double
         var results: [(ID: Int, score: Double)] = []
@@ -163,9 +167,9 @@ extension Game {
         }
     }
     private func fightListToons(of player: Player, with header: String) {
-        Console.write(header)
+        Console.write(0, 1, header)
         for currentToon in player.toons {
-            Console.write(currentToon.getFightPrompt())
+            Console.write(0, 1, currentToon.getFightInfos())
         }
     }
     private func fightPickToon(of player: Player) -> Toon {
@@ -173,7 +177,7 @@ extension Game {
             let promptForNumber = Console.getIntInput(fromTo: 1...player.toons.count)
             let choosenToon = player.toons.first(where: { $0.ID == promptForNumber })!
             if !choosenToon.isAlive() {
-                Console.write(choosenToon.getPicWithName() + " can't fight anymore")
+                Console.write(1, 1, choosenToon.getPicWithName() + " can't fight anymore", 1)
             } else { return choosenToon }
         }
     }
@@ -181,10 +185,10 @@ extension Game {
         guard let doctor = choosenToon as? Medical else {
            return false
         }
-        Console.write("""
+        Console.write(1, 1, """
             What do you want to do with \(doctor.name!) ?
-            1. bring medical help to my team
-            2. \(doctor.tool!.pic) Blow the enemy to smithereens
+            1. Bring medical help to my team
+            2. \(doctor.weapon!.pic) Blow the enemy to smithereens
             """)
         let promptForNumber = Console.getIntInput(fromTo: 1...2)
         
@@ -206,13 +210,13 @@ extension Game {
     
     
     private static func applyDamage(from attacker: Toon, to defender: Toon) -> String {
-        let biologicDamage: Double = attacker.tool!.getBiologicDamage()
+        let biologicDamage: Double = attacker.weapon!.getBiologicDamage()
             * attacker.getBiologicAttack()
             / defender.getBiologicDefense()
-        let kineticDamage: Double = attacker.tool!.getKineticDamage()
+        let kineticDamage: Double = attacker.weapon!.getKineticDamage()
             * attacker.getKineticAttack()
             / defender.getKineticDefense()
-        let thermicDamage: Double = attacker.tool!.getThermicDamage()
+        let thermicDamage: Double = attacker.weapon!.getThermicDamage()
             * attacker.getThermicAttack()
             / defender.getThermicDefense()
 
@@ -220,8 +224,8 @@ extension Game {
             * attacker.getStrenght() / defender.getAgility()
             * attacker.getAccuracy() / defender.getForsight()
         
-        let expectedDamage = attacker.tool!.isUpdated == true ?
-            Setting.Tool.expectedUpdatedDamage : Setting.Tool.expectedBasicDamage
+        let expectedDamage = attacker.weapon!.isUpdated == true ?
+            Setting.Weapon.expectedUpdatedDamage : Setting.Weapon.expectedBasicDamage
         
         let (action, result) =
             (givenDamage < (expectedDamage * 0.9)) ? (" barely scratched " , " causing "):

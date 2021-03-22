@@ -14,26 +14,37 @@ class Console {
     // Upon running a program the path to its executable is passed as argument[0]
     // Argument[0] is accessible through the global CommandLine enum
     static let executableName = (CommandLine.arguments[0] as NSString).lastPathComponent
-    
+
     enum OutputType { case error, standard }
 
     static func write(
+        _ lineBefore: Int = 0,
+        _ tab: Int = 0,
         _ message: String,
-        to: OutputType = .standard,
-        _ header: String? = nil) {
-      switch to {
-        case .standard:
-            // Uses the regular Swift print() function
-            guard let header = header else {
-                print(message)
-                return
+        _ lineAfter: Int = 1) {
+        
+        if lineBefore > 0 { print(String(repeating: "\t", count: lineBefore)) }
+        
+        if tab > 0 {
+            let lines: [String] = message.components(separatedBy: CharacterSet.newlines)
+            for line in lines {
+                print(String(repeating: "\t", count: tab) + line)
             }
-            print(header + " " + message)
-        case .error:
-            // Uses the C function fputs to write to stderr
-            // Stderr is a global variable and points to the standard error stream
-            fputs("[Error] " + message + "\n", stderr)
-      }
+        } else {
+            print(message)
+        }
+        if lineAfter > 0 { print(String(repeating: "\t", count: lineAfter))}
+    }
+    
+    static func writeError(_ message: String) {
+        fputs("[Error] " + message + "\n", stderr) // Uses the C function
+    }
+    
+    static func newLign(){
+        print("\n")
+    }
+    static func tab(){
+        print("\t")
     }
     
     enum InputError: Error {
@@ -57,7 +68,7 @@ class Console {
     
     // MARK: Int input
     private static func promptForIntInput(_ range: ClosedRange<Int>) {
-        Console.write("Type a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' to confirm")
+        Console.write(0, 0, "Type a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' to confirm", 0)
     }
     static func getIntInput(fromTo range: ClosedRange<Int>) -> Int {
         repeat {
@@ -65,16 +76,16 @@ class Console {
             do {
                 let rawInput = try getRawInput()
                 guard let intInput: Int = Int(rawInput) else {
-                    Console.write("No number was found : consider retrying", to: .standard)
+                    Console.write(0, 0, "No number was found : consider retrying")
                     continue
                 }
                 guard range.contains(intInput) else {
-                    Console.write("\(intInput) is not in range : consider retrying", to: .standard)
+                    Console.write(0, 0, "\(intInput) is not in range : consider retrying")
                     continue
                 }
                 return intInput
             } catch {
-                Console.write("No input was found : consider retrying", to: .error)
+                Console.writeError("No input was found : consider retrying")
                 continue
             }
         } while true
@@ -82,7 +93,7 @@ class Console {
     
     // MARK: String input
     private static func promptForStringInput(_ required: String) {
-        Console.write("\nType \(required) and press 'Enter' to confirm")
+        Console.write(0, 0, "Type \(required) and press 'Enter' to confirm", 0)
     }
     private static func contentCheck(content string: String, check charactereSet: CharacterSet) -> Bool {
         let range = string.rangeOfCharacter(from: charactereSet)
@@ -97,16 +108,16 @@ class Console {
             do {
                 let stringInput = try getRawInput()
                 if !allowSpace && contentCheck(content: stringInput, check: .whitespaces) {
-                    Console.write("No space is allowed : consider retrying", to: .standard)
+                    Console.write(0, 0, "No space is allowed : consider retrying")
                     continue
                 }
                 if !allowDigit && contentCheck(content: stringInput, check: .decimalDigits) {
-                    Console.write("No digit is allowed : consider retrying", to: .standard)
+                    Console.write(0, 0, "No digit is allowed : consider retrying")
                     continue
                 }
                 return stringInput
             } catch {
-                Console.write("No input was found : consider retrying", to: .error)
+                Console.writeError("No input was found : consider retrying")
                 continue
             }
         } while true

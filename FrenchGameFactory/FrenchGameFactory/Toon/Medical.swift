@@ -16,8 +16,20 @@ final class Medical: Toon {
         return Medical.newID
     }
     
-    init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
-        super.init(Medical.getNewID(), gender, age, icon, role)
+    var medicalPack: [Medicine] = Medicine.getMedicalPack()
+    
+    init(withGender gender: Gender,
+         withAge age: Age,
+         withPic pic: String,
+         withTitle title: String) {
+        
+        super.init(
+            withID: Medical.getNewID(),
+            withGender: gender,
+            withAge: age,
+            withPic: pic,
+            withTitle: title)
+        
         // Malus = Kinetic, Bonus = Biologic
         self.fightSet.biologic.defense *= Modifier.bonus()
         self.fightSet.biologic.attack *= Modifier.bonus()
@@ -30,25 +42,33 @@ final class Medical: Toon {
     static var All: [Toon] = [Medical]()
     static func createAll(){
         var toon: (pic: String, title: String)
-        var tool: (pic: String, name: String)
+        var weapon: (pic: String, name: String)
         for age in Age.allCases {
             for gender in Gender.allCases {
                 switch (age, gender) {
                 case (.isJunior, .isMan):
-                    toon = ("👨‍🎓", "PostGraduate") ; tool = ("💉", "Stiring Syringe")
+                    toon = ("👨‍🎓", "Post Graduate") ; weapon = ("💉", "Stiring Syringe")
                 case (.isJunior, .isWoman):
-                    toon = ("👩‍🎓", "PostGraduate") ; tool = ("🍿", "Poisoned Popcorn")
+                    toon = ("👩‍🎓", "Post Graduate") ; weapon = ("🍿", "Poisoned Popcorn")
                 case (.isAdult, .isMan):
-                    toon = ("👨‍⚕️", "Biologist") ; tool = ("🩺", "Strangling Stethoscope")
+                    toon = ("👨‍⚕️", "Biologist") ; weapon = ("🩺", "Strangling Stethoscope")
                 case (.isAdult, .isWoman):
-                    toon = ("👩‍⚕️", "Biologist") ; tool = ("🔬", "Mischief Microscope")
+                    toon = ("👩‍⚕️", "Biologist") ; weapon = ("🔬", "Mischief Microscope")
                 case (.isSenior, .isMan):
-                    toon = ("👨‍🔬", "NobelPrice") ; tool = ("🧪", "Secret Substance")
+                    toon = ("👨‍🔬", "Nobel Price") ; weapon = ("🧪", "Secret Substance")
                 case (.isSenior, .isWoman):
-                    toon = ("👩‍🔬", "NobelPrice") ; tool = ("🦠", "Vicious Virus")
+                    toon = ("👩‍🔬", "Nobel Price") ; weapon = ("🦠", "Vicious Virus")
             }
-            let newMedical: Medical = Medical(gender, age, toon.pic, toon.title)
-            newMedical.tool = BiologicWeapon(age, tool.pic, tool.name)
+            let newMedical: Medical = Medical(
+                withGender: gender,
+                withAge: age,
+                withPic: toon.pic,
+                withTitle: toon.title)
+            newMedical.weapon = BiologicWeapon(
+                withGender: gender,
+                withAge: age,
+                withPic: weapon.pic,
+                withName: weapon.name)
             All.append(newMedical)
             }
         }

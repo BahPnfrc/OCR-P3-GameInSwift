@@ -16,8 +16,18 @@ final class Engineer: Toon {
         return Engineer.newID
     }
 
-    init(_ gender: Gender,_ age: Age, _ icon: String, _ role: String) {
-        super.init(Engineer.getNewID(), gender, age, icon, role)
+    init(withGender gender: Gender,
+         withAge age: Age,
+         withPic pic: String,
+         withTitle title: String) {
+        
+        super.init(
+            withID: Engineer.getNewID(),
+            withGender: gender,
+            withAge: age,
+            withPic: pic,
+            withTitle: title)
+        
         // Malus = Thermic, Bonus = Kinetic
         self.fightSet.biologic.defense *= Modifier.same()
         self.fightSet.biologic.attack *= Modifier.same()
@@ -30,25 +40,33 @@ final class Engineer: Toon {
     static var All: [Toon] = [Engineer]()
     static func createAll(){
         var toon: (pic: String, title: String)
-        var tool: (pic: String, name: String)
+        var weapon: (pic: String, name: String)
         for age in Age.allCases {
             for gender in Gender.allCases {
                 switch (age, gender) {
                 case (.isJunior, .isMan):
-                    toon = ("👨‍🔧", "YoungMeccano") ; tool = ("🔧", "BloodStench Wrench")
+                    toon = ("👨‍🔧", "Young Meccano") ; weapon = ("🔧", "BloodStench Wrench")
                 case (.isJunior, .isWoman):
-                    toon = ("👩‍🔧,", "YoungMeccano") ; tool = ("🔩", "ChewThrough Screw")
+                    toon = ("👩‍🔧,", "Young Meccano") ; weapon = ("🔩", "ChewThrough Screw")
                 case (.isAdult, .isMan):
-                    toon = ("👨‍💻", "MachineCoder") ; tool = ("💻", "MacBook Pro")
+                    toon = ("👨‍💻", "Apple Coder") ; weapon = ("💻", "MacBook Pro")
                 case (.isAdult, .isWoman):
-                    toon = ("👩‍💻", "MachineCoder") ; tool = ("🖥", "iMac Pro")
+                    toon = ("👩‍💻", "Apple Coder") ; weapon = ("🖥", "iMac Pro")
                 case (.isSenior, .isMan):
-                    toon = ("👨‍💼", "EmeritusProfessor") ; tool = ("📡", "Parabellum Parrabolla")
+                    toon = ("👨‍💼", "Emeritus") ; weapon = ("📡", "Parabellum Parrabolla")
                 case (.isSenior, .isWoman):
-                    toon = ("👩‍💼", "EmeritusProfessor") ; tool = ("🦾", "Bionic Beef")
+                    toon = ("👩‍💼", "Emeritus") ; weapon = ("🦾", "Bionic Beef")
             }
-            let newEngineer: Engineer = Engineer(gender, age, toon.pic, toon.title)
-            newEngineer.tool = KineticWeapon(age, tool.pic, tool.name)
+            let newEngineer: Engineer = Engineer(
+                withGender: gender,
+                withAge: age,
+                withPic: toon.pic,
+                withTitle: toon.title)
+            newEngineer.weapon = KineticWeapon(
+                withGender: gender,
+                withAge: age,
+                withPic: weapon.pic,
+                withName: weapon.name)
             All.append(newEngineer)
             }
         }

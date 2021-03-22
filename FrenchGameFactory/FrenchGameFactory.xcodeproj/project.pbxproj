@@ -12,6 +12,11 @@
 		0B296D1F2605E986006AA880 /* Engineer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D1E2605E986006AA880 /* Engineer.swift */; };
 		0B296D282608043A006AA880 /* Medicine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D272608043A006AA880 /* Medicine.swift */; };
 		0B296D2C26080521006AA880 /* Weapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D2B26080521006AA880 /* Weapon.swift */; };
+		0B296D2F2608906D006AA880 /* BiologicWeapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D2E2608906D006AA880 /* BiologicWeapon.swift */; };
+		0B296D33260890B4006AA880 /* KineticWeapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D32260890B4006AA880 /* KineticWeapon.swift */; };
+		0B296D3626089163006AA880 /* ThermicWeapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D3526089163006AA880 /* ThermicWeapon.swift */; };
+		0B296D3F2608EC0D006AA880 /* Human.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D3E2608EC0D006AA880 /* Human.swift */; };
+		0B296D432608EC18006AA880 /* Machine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D422608EC18006AA880 /* Machine.swift */; };
 		0B9062EE25EE99FB00F7E328 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062ED25EE99FB00F7E328 /* main.swift */; };
 		0B9062F625EEA17F00F7E328 /* Console.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062F525EEA17F00F7E328 /* Console.swift */; };
 		0B9062F925F116FD00F7E328 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062F825F116FD00F7E328 /* Game.swift */; };
@@ -41,6 +46,11 @@
 		0B296D1E2605E986006AA880 /* Engineer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engineer.swift; sourceTree = "<group>"; };
 		0B296D272608043A006AA880 /* Medicine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Medicine.swift; sourceTree = "<group>"; };
 		0B296D2B26080521006AA880 /* Weapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weapon.swift; sourceTree = "<group>"; };
+		0B296D2E2608906D006AA880 /* BiologicWeapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiologicWeapon.swift; sourceTree = "<group>"; };
+		0B296D32260890B4006AA880 /* KineticWeapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KineticWeapon.swift; sourceTree = "<group>"; };
+		0B296D3526089163006AA880 /* ThermicWeapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermicWeapon.swift; sourceTree = "<group>"; };
+		0B296D3E2608EC0D006AA880 /* Human.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Human.swift; sourceTree = "<group>"; };
+		0B296D422608EC18006AA880 /* Machine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Machine.swift; sourceTree = "<group>"; };
 		0B9062EA25EE99FB00F7E328 /* FrenchGameFactory */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FrenchGameFactory; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B9062ED25EE99FB00F7E328 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		0B9062F525EEA17F00F7E328 /* Console.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Console.swift; sourceTree = "<group>"; };
@@ -68,27 +78,27 @@
 			isa = PBXGroup;
 			children = (
 				0BE46A1825F2D51D0073884F /* Toon.swift */,
-				0B296D172605E924006AA880 /* Medical.swift */,
 				0B296D1E2605E986006AA880 /* Engineer.swift */,
 				0B296D1B2605E94B006AA880 /* Military.swift */,
+				0B296D172605E924006AA880 /* Medical.swift */,
 			);
 			path = Toon;
 			sourceTree = "<group>";
 		};
-		0B296D222605F64C006AA880 /* Metadata */ = {
+		0B296D222605F64C006AA880 /* Meta */ = {
 			isa = PBXGroup;
 			children = (
 				0BB302BD25FBBAD0005C424F /* Settings.swift */,
+				0B9062F525EEA17F00F7E328 /* Console.swift */,
 				0BB302C025FCF542005C424F /* Modifier.swift */,
 			);
-			path = Metadata;
+			path = Meta;
 			sourceTree = "<group>";
 		};
 		0B296D232605F6E0006AA880 /* Workflow */ = {
 			isa = PBXGroup;
 			children = (
-				0B9062F525EEA17F00F7E328 /* Console.swift */,
-				0BE46A1E25F420430073884F /* Player.swift */,
+				0B296D3D2608EBF4006AA880 /* Player */,
 				0B9062F825F116FD00F7E328 /* Game.swift */,
 			);
 			path = Workflow;
@@ -98,10 +108,39 @@
 			isa = PBXGroup;
 			children = (
 				0BE46A1B25F2D96E0073884F /* Tool.swift */,
-				0B296D2B26080521006AA880 /* Weapon.swift */,
-				0B296D272608043A006AA880 /* Medicine.swift */,
+				0B296D39260891BD006AA880 /* Medical */,
+				0B296D3A260891DA006AA880 /* Military */,
 			);
 			path = Tool;
+			sourceTree = "<group>";
+		};
+		0B296D39260891BD006AA880 /* Medical */ = {
+			isa = PBXGroup;
+			children = (
+				0B296D272608043A006AA880 /* Medicine.swift */,
+			);
+			path = Medical;
+			sourceTree = "<group>";
+		};
+		0B296D3A260891DA006AA880 /* Military */ = {
+			isa = PBXGroup;
+			children = (
+				0B296D2B26080521006AA880 /* Weapon.swift */,
+				0B296D32260890B4006AA880 /* KineticWeapon.swift */,
+				0B296D3526089163006AA880 /* ThermicWeapon.swift */,
+				0B296D2E2608906D006AA880 /* BiologicWeapon.swift */,
+			);
+			path = Military;
+			sourceTree = "<group>";
+		};
+		0B296D3D2608EBF4006AA880 /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				0BE46A1E25F420430073884F /* Player.swift */,
+				0B296D3E2608EC0D006AA880 /* Human.swift */,
+				0B296D422608EC18006AA880 /* Machine.swift */,
+			);
+			path = Player;
 			sourceTree = "<group>";
 		};
 		0B9062E125EE99FB00F7E328 = {
@@ -124,8 +163,8 @@
 			isa = PBXGroup;
 			children = (
 				0B9062ED25EE99FB00F7E328 /* main.swift */,
+				0B296D222605F64C006AA880 /* Meta */,
 				0B296D232605F6E0006AA880 /* Workflow */,
-				0B296D222605F64C006AA880 /* Metadata */,
 				0B296D162605E8F5006AA880 /* Toon */,
 				0B296D2626080414006AA880 /* Tool */,
 				0BB302C325FD2B33005C424F /* Toto.swift */,
@@ -191,6 +230,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B9062EE25EE99FB00F7E328 /* main.swift in Sources */,
+				0B296D3626089163006AA880 /* ThermicWeapon.swift in Sources */,
 				0B296D282608043A006AA880 /* Medicine.swift in Sources */,
 				0BE46A1925F2D51D0073884F /* Toon.swift in Sources */,
 				0B296D2C26080521006AA880 /* Weapon.swift in Sources */,
@@ -202,8 +242,12 @@
 				0BE46A1F25F420430073884F /* Player.swift in Sources */,
 				0B9062F625EEA17F00F7E328 /* Console.swift in Sources */,
 				0BB302C125FCF542005C424F /* Modifier.swift in Sources */,
+				0B296D432608EC18006AA880 /* Machine.swift in Sources */,
+				0B296D3F2608EC0D006AA880 /* Human.swift in Sources */,
+				0B296D2F2608906D006AA880 /* BiologicWeapon.swift in Sources */,
 				0B296D1C2605E94B006AA880 /* Military.swift in Sources */,
 				0B296D182605E924006AA880 /* Medical.swift in Sources */,
+				0B296D33260890B4006AA880 /* KineticWeapon.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,6 +11,7 @@ import Foundation
 // singleton design pattern
 //toto.shared.tata()
 
+
 Engineer.createAll()
 Medical.createAll()
 Military.createAll()

@@ -85,7 +85,7 @@ class Toon: LifeSet, SkillSet, FightSet {
     var pic: String
     var title: String
     
-    var tool: Tool?
+    var weapon: Weapon?
     
     // MARK: LifeSet
     var lifeSet: (
@@ -125,12 +125,17 @@ class Toon: LifeSet, SkillSet, FightSet {
     lazy var globalSet: Double = globalSkillSet * globalFightSet
     
     // MARK: Init
-    init(_ id: Int, _ gender: Gender, _ age: Age, _ icon: String, _ title: String ){
+    init(
+        withID id: Int,
+        withGender gender: Gender,
+        withAge age: Age,
+        withPic pic: String,
+        withTitle title: String ){
         
         self.ID = id
         self.gender = gender
         self.age = age
-        self.pic = icon
+        self.pic = pic
         self.title = title
 
         switch self.gender {
@@ -170,36 +175,48 @@ extension Toon { //
         }
         return pic + " " + title + " " + name
     }
-    func getChoosePrompt() -> String {
+    func getFirstPromptInfos() -> String {
         let name: String = String(ID) + ". " +  getPicWithName() + " " + gender.rawValue
         let age: String = "A " + self.age.rawValue
-        let tool: String = "armed with " + getHisOrHer() + self.tool!.getPicWithName()
+        let tool: String = "armed with " + getHisOrHer() + self.weapon!.getPicWithName()
         return name + " : " + age + " " + tool
     }
-    func getFightPrompt() -> String {
+    func getFightInfos() -> String {
         let name : String = String(ID) + ". " + getPicWithName()
-        let tool : String = self.tool!.getPicWithName()
-        let life : String = _getlifeBar()
-        return name + " " + tool + "\n" + life
+        let tool : String = self.weapon!.getPicWithName()
+        return name + " : " + tool
     }
-    private func _getlifeBar() -> String {
+    func getLifeBar() -> String {
+        // A - Percent as a string
         let totalHP = Setting.Toon.defaultLifeSet.hitpoints
-        let leftHP = self.lifeSet.hitpoints
-        var percentLeft: Int = Int(100 / totalHP * leftHP)
+        let leftHP = Int.random(in: 300...800) //self.lifeSet.hitpoints
+        var percentLeft: Int = getPercent(actuel: leftHP, total: totalHP)
         let percentAsString = " " + String(percentLeft) + "%"
-        let model: [String] = "🟥,🟥,🟧,🟧,🟨,🟨,🟩,🟩,🟩,🟩".components(separatedBy: ",")
+        // B - Percent as a picture
+        let visualModel: String =
+            String(repeating: "🟥,", count: 4) +
+            String(repeating: "🟧,", count: 4) +
+            String(repeating: "🟨,", count: 4) +
+            String(repeating: "🟩,", count: 15) + "🟩"
+        let model: [String] = visualModel.components(separatedBy: ",")
+        let percentPerPicture = 100 / model.count
         var lifeBar: String = ""
-        for currentIndex in 0...model.count {
-            if percentLeft > 9 {
-                lifeBar.append(model[currentIndex])
-                percentLeft -= 10
-            } else { lifeBar.append("⬜️")}
+        for currentIconIndex in 0...model.count - 1 { // For each icon
+            if percentLeft >= percentPerPicture {
+                lifeBar.append(model[currentIconIndex]) // Add the colored icon
+                percentLeft -= percentPerPicture
+            } else {
+                lifeBar.append("⬜️") // Add a blanck icon
+            }
         }
         return lifeBar + percentAsString
     }
-    
-    
-    
+    private func getPercent(actuel: Int, total: Int) -> Int {
+        let actuelDouble: Double = Double(actuel)
+        let totalDouble: Double = Double(total)
+        let result = actuelDouble * 100 / totalDouble
+        return Int(result)
+    }
     
 }
 
