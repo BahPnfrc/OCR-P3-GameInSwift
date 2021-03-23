@@ -86,6 +86,7 @@ class Toon: LifeSet, SkillSet, FightSet {
     var title: String
     
     var weapon: Weapon?
+    var isInTeam = false
     
     // MARK: LifeSet
     var lifeSet: (
@@ -163,6 +164,12 @@ class Toon: LifeSet, SkillSet, FightSet {
 // MARK: Extension : Retrieve data
 extension Toon { //
     
+    static func resetAllID() {
+        for toon in Engineer.All { toon.ID = 0 }
+        for toon in Military.All { toon.ID = 0 }
+        for toon in Medical.All { toon.ID = 0 }
+    }
+    
     func getHisOrHer() -> String {
         gender == .isMan ? "his " : "her "
     }
@@ -184,12 +191,12 @@ extension Toon { //
     func getFightInfos() -> String {
         let name : String = String(ID) + ". " + getPicWithName()
         let tool : String = self.weapon!.getPicWithName()
-        return name + " : " + tool
+        return name + " with " + getHisOrHer() + tool
     }
     func getLifeBar() -> String {
         // A - Percent as a string
         let totalHP = Setting.Toon.defaultLifeSet.hitpoints
-        let leftHP = Int.random(in: 300...800) //self.lifeSet.hitpoints
+        let leftHP = self.lifeSet.hitpoints
         var percentLeft: Int = getPercent(actuel: leftHP, total: totalHP)
         let percentAsString = " " + String(percentLeft) + "%"
         // B - Percent as a picture

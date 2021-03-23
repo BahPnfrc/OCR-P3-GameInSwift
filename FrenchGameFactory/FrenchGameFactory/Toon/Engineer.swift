@@ -47,15 +47,15 @@ final class Engineer: Toon {
                 case (.isJunior, .isMan):
                     toon = ("👨‍🔧", "Young Meccano") ; weapon = ("🔧", "BloodStench Wrench")
                 case (.isJunior, .isWoman):
-                    toon = ("👩‍🔧,", "Young Meccano") ; weapon = ("🔩", "ChewThrough Screw")
+                    toon = ("👩‍🔧", "Young Meccano") ; weapon = ("🔩", "ChewThrough Screw")
                 case (.isAdult, .isMan):
                     toon = ("👨‍💻", "Apple Coder") ; weapon = ("💻", "MacBook Pro")
                 case (.isAdult, .isWoman):
                     toon = ("👩‍💻", "Apple Coder") ; weapon = ("🖥", "iMac Pro")
                 case (.isSenior, .isMan):
-                    toon = ("👨‍💼", "Emeritus") ; weapon = ("📡", "Parabellum Parrabolla")
+                    toon = ("👨‍💼", "Emeritus Pr.") ; weapon = ("📡", "Parabellum Parrabolla")
                 case (.isSenior, .isWoman):
-                    toon = ("👩‍💼", "Emeritus") ; weapon = ("🦾", "Bionic Beef")
+                    toon = ("👩‍💼", "Emeritus Pr.") ; weapon = ("🦾", "Bionic Beef")
             }
             let newEngineer: Engineer = Engineer(
                 withGender: gender,

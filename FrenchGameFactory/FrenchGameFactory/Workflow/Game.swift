@@ -14,42 +14,46 @@ class Game {
     
     var mode: Mode
     var level: Level = .isDefault
-    
     var player: (main: Player, second: Player)
-    
+    var order: [Player] = []
     
     init(){
         // MARK: A - MODE
-        Console.write(0, 0, "WELCOME TO THE GAME", 0)
+        Console.write(0, 0, "WELCOME TO THE GAME")
         Console.write(1, 1, """
             How do you want to play ?
-            1. Against a friend
-            2. Against the machine
-            """)
+            1. 🧠 Against a friend
+            2. ⚙️ Against the machine
+            """, 1)
         let modePrompt:Int = Console.getIntInput(fromTo: 1...2)
         mode = modePrompt == 1 ? .isVersusHuman: .isVersusMachine
         
         // MARK: B - MAIN PLAYER
         let mainNamePrompt: String = Console.getStringInput(prompt: "your name")
-        player.main = Human(mainNamePrompt) as Player
+        player.main = Human(mainNamePrompt.uppercased()) as Player
         
         // MARK: C - SECOND PLAYER
         switch mode {
         case .isVersusHuman:
-            let secondNamePrompt = Console.getStringInput(prompt: "the other player's name")
-            player.second = Human(secondNamePrompt) as Player
+            var secondNamePrompt: String = ""
+            while true {
+                secondNamePrompt = Console.getStringInput(prompt: "the other player's name")
+                if secondNamePrompt == player.main.name { Console.write(1, 1, "⚠️ Players can't have the same name : try another ⚠️", 1)}
+                else { break }
+            }
+            player.second = Human(secondNamePrompt.uppercased()) as Player
         case .isVersusMachine:
-            
-            // MARK: D - LEVEL
+            Console.newSection()
             player.second = Machine() as Player
-            Console.write(1, 0,
+            Console.write(0, 0,
                 "Ok \(player.main.name), I'm \(player.second.name) and I'm your opponent !", 0)
+            // MARK: D - LEVEL
             Console.write(1, 1, """
                 Choose my level :
-                1. 🌸 Easy : Because you're soft and delicate
-                2. 🏓 Medium : Real one on one baby
-                3. 🪖 Hard : Can't fight the dust
-                """)
+                1. 🌸 Easy. Because you're soft and delicate
+                2. 🏓 Medium. For a real one on one baby
+                3. 🪖 Hard. Can't fight the dust !
+                """, 1)
             let levelPrompt: Int = Console.getIntInput(fromTo: 1...3)
             level =
                 levelPrompt == 1 ? .easy:
@@ -59,73 +63,125 @@ class Game {
     }
     
     func run(){
+        orderPlayers()
         chooseToons()
     }
 }
 
-// MARK: E - CHOOSE TOONS
+// MARK: E - ORDER PLAYERS
+extension Game {
+    private func orderPlayers(){
+        Console.newSection()
+        Console.write(0, 0, """
+            OK \(player.main.name), two teams will now be made.
+            Choosing toons first is penalized by shooting second.
+            """)
+        Console.write(1, 1, """
+            Who choose first :
+            1. 🏆 I want to choose first no matter what
+            2. 🎳 I'd prefer to shoot first so I'll choose second
+            3. 🎲 I'd rather roll the dice and let chance decide
+            """, 1)
+        let orderPrompt: Int = Console.getIntInput(fromTo: 1...3)
+        order =
+            orderPrompt == 1 ? [player.main, player.second] :
+            orderPrompt == 2 ? [player.second, player.main] :
+            [player.main, player.second].shuffled()
+    }
+}
+
+// MARK: F - CHOOSE TOONS
 extension Game {
     private func chooseToons(){
-        let humanHeader = (
-            main: """
-            Ok \(player.main.name), time is to choose your toons.
-            You must pick one Engineer, one Military and one Medical.
-            """,
-            second: "OK, \(player.second.name), it's your turn now.")
-        humanChoose(withHeader: humanHeader.main, for: player.main)
-        _ = player.main.listAllToons(aliveOnly: false)
-        
-        
+        let firstToChoose: Player = order[0]
+        let secondToChose: Player = order[1]
         if self.mode == .isVersusHuman {
-            humanChoose(withHeader: humanHeader.second, for: player.second)
+            // A - First is Human 
+            _humanChoose(forPlayer: firstToChoose)
+            // B - Second player is Human
+            let header = "OK, \(secondToChose.name), it's your turn now."
+            _humanChoose(forPlayer: secondToChose, withHeader: header)
         } else {
-            let machineHeader = "OK, I'm choosing my toons as well. Let me see..."
-            machineChoose(withHeader: machineHeader)
+            if let machine = firstToChoose as? Machine {
+                // A - First player is Machine
+                _machineChoose(forPlayer: machine)
+                // B - Second player is Human
+                _humanChoose(forPlayer: secondToChose)
+            }
+            else {
+                // A - First player is Human
+                _humanChoose(forPlayer: firstToChoose)
+                // B - Second player is Machine
+                _machineChoose(forPlayer: secondToChose)
+            }
         }
-        _ = player.second.listAllToons(aliveOnly: false)
+        // C - Show both teams
+        Console.newSection()
+        Console.write(0, 0, "So here are both teams :")
+        _ = firstToChoose.listAllToons(aliveOnly: false)
+        _ = secondToChose.listAllToons(aliveOnly: false)
     }
-    private func humanChoose(withHeader header: String, for player: Player){
-        Console.write(1, 0, header)
+    private func _humanChoose(forPlayer human: Player, withHeader header: String? = nil){
+        let defaultHeader: String = """
+            Ok \(human.name), time is to choose your toons.
+            You must pick one Engineer, one Military and one Medical.
+            """
+        Console.newSection()
+        Console.write(0, 0, header ?? defaultHeader)
         let toonTypes = [
-             (all: Engineer.All, message: "There it goes all Engineers :"),
+             (all: Engineer.All, message: "There it goes Engineers :"),
              (all: Military.All, message: "Time is to pick up a Military now :"),
              (all: Medical.All, message: "You can finally pick up your Medical :")]
+        var previousNames: [String] = []
         for toonType in toonTypes { // For each type of toon
             // A - Show message and list all toons
-            Console.write(0, 1, toonType.message, 0)
-            for toon in toonType.all { Console.write(0, 1, toon.getFirstPromptInfos(), 0) }
+            Console.write(1, 1, toonType.message, 0)
+            var maxPromptID: Int = 0
+            for toon in toonType.all {
+                if !toon.isInTeam {
+                    maxPromptID += 1 ; toon.ID = maxPromptID
+                    Console.write(0, 1, toon.getFirstPromptInfos(), 0)
+                } else {toon.ID = 0}
+            }
             // B - Prompt to choose a toon by its ID
-            Console.newLign()
-            let promptForNumber: Int = Console.getIntInput(fromTo: 1...toonType.all.count)
+            Console.emptyLine()
+            let promptForNumber: Int = Console.getIntInput(fromTo: 1...maxPromptID)
             let chosenToon: Toon = toonType.all.first(where: {$0.ID == promptForNumber})!
             // C - Prompt to choose a name for this toon
-            let promptForName: String = Console.getStringInput(prompt: "a name for this toon")
-            chosenToon.name = promptForName
-            player.toons.append(chosenToon)
+            var promptForName: String = ""
+            while true {
+                promptForName = Console.getStringInput(prompt: "a name for this toon")
+                if previousNames.contains(promptForName){ Console.write(1, 1, "⚠️ Toons can't have the same name : try another ⚠️", 1)}
+                else { previousNames.append(promptForName) ; break }
+            }
+            chosenToon.name = promptForName.uppercased()
+            chosenToon.isInTeam = true
+            human.toons.append(chosenToon)
         }
     }
-    private func machineChoose(withHeader header: String) {
-        Console.write(0, 0, header)
-        let toonTypes = [Engineer.All, Military.All, Medical.All]
-        var currentID : Int ; var currentScore: Double
-        var results: [(ID: Int, score: Double)] = []
-        for toonType in toonTypes { // For each type of toon
-            // A - Copy its score and associated ID to an array
-            for toon in toonType { // For each toon of this type
-                (currentID, currentScore) = (toon.ID, toon.globalSet) // Get ID and score
-                results.append((ID: currentID, score: currentScore)) // Add them to results
+    private func _machineChoose(forPlayer machine: Player) {
+        var results: [(ID: Int, globalSet: Double)] = []
+        let toonClasses = [Engineer.All, Military.All, Medical.All]
+        for toonClass in toonClasses { // For each class of toons
+            // A - Copy to an array each toon ID and global set
+            var maxPromptID: Int = 0
+            for toon in toonClass {
+                if !toon.isInTeam {
+                    maxPromptID += 1 ; toon.ID = maxPromptID
+                    results.append((toon.ID, toon.globalSet))
+                } else {toon.ID = 0}
             }
             // B - Order this array according to the level
             switch level {
-            case .easy: results.sort { $0.score < $1.score } // Put lowest score on top
-            case .hard: results.sort { $0.score > $1.score } // Put highest score on top
+            case .easy: results.sort { $0.globalSet < $1.globalSet } // Lowest score on top
+            case .hard: results.sort { $0.globalSet > $1.globalSet } // Highest score on top
             default: results.shuffle() // Simple shuffle
             }
-            // C - Pick toons at the top of the array
-            let requestedID: Int = results[0].ID
-            let rightToon = toonType.first(where: {$0.ID == requestedID} )!
-            rightToon.name = rightToon.getRandomName()
-            player.second.toons.append(rightToon)
+            // C - Pick the toon at the top [0] index
+            let rightToon = toonClass.first(where: {$0.ID == results[0].ID} )!
+            rightToon.name = rightToon.getRandomName().uppercased() // Get a random 1900' style name
+            rightToon.isInTeam = true
+            machine.toons.append(rightToon)
             results.removeAll() // For next loop
         }
     }
@@ -139,14 +195,12 @@ extension Game {
         
         fightResetToonsID()
         var round: Int = 0
-        //getOrder()
-        
-        var players = [player.main, player.second]
         repeat {
             round += 1
             // A - Pick one player
-            let (attacker, defender) = (players[0], players[1]) // Get the first player
-            players.swapAt(0, 1) // Swap for the next round
+            order.swapAt(0, 1) // Swap players at each round
+            let (attacker, defender) = (order[0], order[1]) // Get the first player
+            
             // B - Lists all toons
             fightListToons(of: attacker, with: "OK \(attacker.name), pick your champion :")
             // C - Choose one toon

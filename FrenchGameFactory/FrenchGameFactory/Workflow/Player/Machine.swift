@@ -13,7 +13,7 @@ final class Machine: Player {
     private static var randomName: String {
             Machine.randomNames.count > 0 ?
             Machine.randomNames.randomElement()!:
-            "TheMachine"}
+            "MACHINE"}
     
     init(_ name: String?) {
         guard let name = name else {

@@ -25,17 +25,19 @@ class Player {
     }
     
     func listAllToons(aliveOnly: Bool, header: String? = nil) -> ClosedRange<Int> {
+        // Header
+        let header: String = header ?? "Team of \(self.name) :"
+        Console.write(1, 1, header,0)
+        // Body
+        var body:String = ""
         var currentPromptIndex = 0
-        let message: String = header ?? "Team of \(self.name) :"
-        Console.write(1, 1, message,0)
         for toon in self.toons {
             if aliveOnly == true && !toon.isAlive() {continue}
             currentPromptIndex += 1
             toon.ID = currentPromptIndex
-            Console.write(0, 1, toon.getFightInfos(),0)
-            Console.write(0, 1, toon.getLifeBar(),0)
+            body.append( toon.getFightInfos() + "\n" + toon.getLifeBar()  + "\n")
         }
-        Console.newLign()
+        Console.write(0, 1, body)
         return 1...currentPromptIndex
     }
 }
