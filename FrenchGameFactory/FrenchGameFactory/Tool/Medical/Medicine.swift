@@ -14,18 +14,16 @@ final class Medicine : Tool {
     var promptID: Int = 0
     let type: MedicineType
     var about: String = ""
-    var usage: (
-        wasUsed: Int,
-        maxUse: Int)
+    var left: Int
     
     init(withPic pic: String,
          withName name: String,
          withType type: MedicineType,
-         withUsage usage: (Int, Int),
+         withLeft left: Int,
          withAbout about: String) {
         
         self.type = type
-        self.usage = usage
+        self.left = left
         self.about = about
         super.init(
             withPic: pic,
@@ -38,19 +36,19 @@ final class Medicine : Tool {
                 withPic: "🩹",
                 withName: "Savage Bandage",
                 withType: .isLight,
-                withUsage: (0, 2),
+                withLeft: 1,
                 withAbout: "it restores receiver health to 70%")
         let medium: Medicine = Medicine(
                 withPic: "💊",
                 withName: "Precision Pill",
                 withType: .iSMedium,
-                withUsage: (0, 1),
+                withLeft: 1,
                 withAbout: "it restores receiver health to 90%")
         let heavy: Medicine = Medicine(
                 withPic: "🧬",
                 withName: "Dna Denaturator",
                 withType: .isHeavy,
-                withUsage: (0, 1),
+                withLeft: 1,
                 withAbout: "it restores all toons health to 50%")
         return [light, medium, heavy]
     }

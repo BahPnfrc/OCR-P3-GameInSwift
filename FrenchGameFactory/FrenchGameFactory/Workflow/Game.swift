@@ -113,11 +113,11 @@ extension Game {
                 _chooseStep_machineChoose(forPlayer: secondToChose)
             }
         }
-        // C - Show both teams
-        Console.newSection()
-        Console.write(0, 0, "So here are both teams :")
-        _ = firstToChoose.listAllToons(aliveOnly: false)
-        _ = secondToChose.listAllToons(aliveOnly: false)
+//        // C - Show both teams
+//        Console.newSection()
+//        Console.write(0, 0, "So here are both teams :")
+//        _ = firstToChoose.listAllToons(aliveOnly: false)
+//        _ = secondToChose.listAllToons(aliveOnly: false)
     }
     private func _chooseStep_humanChoose(forPlayer human: Player, withHeader header: String? = nil){
         let defaultHeader: String = """
@@ -195,6 +195,8 @@ extension Game {
         var round: Int = 0
         repeat {
             round += 1
+            Console.newSection()
+            Console.write(0, 0, "The fight is in progress : Round \(round)")
             // A - Pick one player
             queueSaver.swapAt(0, 1) // Swap players at each round
             let (attacker, defender) = (queueSaver[0], queueSaver[1])
@@ -227,13 +229,13 @@ extension Game {
         let pack: [Medicine] = doctor.medicalPack
         var promptID: Int = 0 ; var promptText: String = ""
         for index in 0...2 {
-            if pack[index].usage.wasUsed < pack[index].usage.wasUsed {
+            if pack[index].left > 0 {
                 promptID += 1 ; pack[index].promptID = promptID
-                promptText += "\(promptID). Use a \(pack[index].getPicWithName()) : \(pack[index].usage)\n"
+                promptText += "\(promptID). Use \(doctor.getHisOrHer())\(pack[index].getPicWithName()) : \(pack[index].about)\n"
             } else { pack[index].promptID = 0 }
         }
         let weaponPromptID: Int = promptID + 1 ; let maxPromptID = weaponPromptID
-        promptText += "\(weaponPromptID). Use \(doctor.weapon!.getPicWithName()) : it blows haters to smithereens"
+        promptText += "\(weaponPromptID). Use \(doctor.getHisOrHer())\(doctor.weapon!.getPicWithName()) : it blows haters to smithereens"
         // C - Call prompt and get result
         Console.write(1, 1, """
             What do you want to do with \(doctor.name!) ?
