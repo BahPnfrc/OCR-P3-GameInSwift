@@ -15,9 +15,15 @@ protocol LifeSet {
         {get set}
 }
 extension LifeSet {
-    mutating func isHit(amount: Int){ lifeSet.hitpoints -= amount}
-    mutating func isHealed(amount: Int){lifeSet.hitpoints += amount}
-    func hitPointsLeft() -> Int {return lifeSet.hitpoints}
+    mutating func takeHit(for amount: Int){ lifeSet.hitpoints -= amount}
+    mutating func receiveMedicine(for amount: Int){lifeSet.hitpoints += amount}
+    func getHitPointsLeft() -> Int {return lifeSet.hitpoints}
+    func getPercentLeft() -> Int {
+        let actuelDouble: Double = Double(getHitPointsLeft())
+        let totalDouble: Double = Double(Setting.Toon.defaultLifeSet.hitpoints)
+        let result = actuelDouble * 100 / totalDouble
+        return Int(result)
+    }
     func isAlive() -> Bool {return lifeSet.hitpoints > 0}
 }
 
@@ -77,13 +83,14 @@ enum Age: String, CaseIterable {
 // MARK: Class
 class Toon: LifeSet, SkillSet, FightSet {
     
-    var ID: Int
-    var gender: Gender
-    var age: Age
+    let ID: Int
+    var promptID: Int = 0
+    let gender: Gender
+    let age: Age
     
     var name: String?
-    var pic: String
-    var title: String
+    let pic: String
+    let title: String
     
     var weapon: Weapon?
     var isInTeam = false
@@ -164,10 +171,10 @@ class Toon: LifeSet, SkillSet, FightSet {
 // MARK: Extension : Retrieve data
 extension Toon { //
     
-    static func resetAllID() {
-        for toon in Engineer.All { toon.ID = 0 }
-        for toon in Military.All { toon.ID = 0 }
-        for toon in Medical.All { toon.ID = 0 }
+    static func resetAllPromptID() {
+        for toon in Engineer.All { toon.promptID = 0 }
+        for toon in Military.All { toon.promptID = 0 }
+        for toon in Medical.All { toon.promptID = 0 }
     }
     
     func getHisOrHer() -> String {
@@ -183,21 +190,24 @@ extension Toon { //
         return pic + " " + title + " " + name
     }
     func getFirstPromptInfos() -> String {
-        let name: String = String(ID) + ". " +  getPicWithName() + " " + gender.rawValue
+        let name: String = String(promptID) + ". " +  getPicWithName() + " " + gender.rawValue
         let age: String = "A " + self.age.rawValue
         let tool: String = "armed with " + getHisOrHer() + self.weapon!.getPicWithName()
         return name + " : " + age + " " + tool
     }
     func getFightInfos() -> String {
-        let name : String = String(ID) + ". " + getPicWithName()
+        let name : String = String(promptID) + ". " + getPicWithName()
         let tool : String = self.weapon!.getPicWithName()
         return name + " with " + getHisOrHer() + tool
     }
-    func getLifeBar() -> String {
+    
+    func getFightInfosWithBar() -> String {
+        return getFightInfos() + "\n" + getDynamicLifeBar() + "\n"
+    }
+    
+    func getStaticLifeBar() -> String {
         // A - Percent as a string
-        let totalHP = Setting.Toon.defaultLifeSet.hitpoints
-        let leftHP = self.lifeSet.hitpoints
-        var percentLeft: Int = getPercent(actuel: leftHP, total: totalHP)
+        var percentLeft: Int = getPercentLeft()
         let percentAsString = " " + String(percentLeft) + "%"
         // B - Percent as a picture
         let visualModel: String =
@@ -206,23 +216,37 @@ extension Toon { //
             String(repeating: "🟨,", count: 4) +
             String(repeating: "🟩,", count: 15) + "🟩"
         let model: [String] = visualModel.components(separatedBy: ",")
-        let percentPerPicture = 100 / model.count
+        let percentPerBloc = 100 / model.count
         var lifeBar: String = ""
         for currentIconIndex in 0...model.count - 1 { // For each icon
-            if percentLeft >= percentPerPicture {
+            if percentLeft >= percentPerBloc {
                 lifeBar.append(model[currentIconIndex]) // Add the colored icon
-                percentLeft -= percentPerPicture
+                percentLeft -= percentPerBloc
             } else {
                 lifeBar.append("⬜️") // Add a blanck icon
             }
         }
         return lifeBar + percentAsString
     }
-    private func getPercent(actuel: Int, total: Int) -> Int {
-        let actuelDouble: Double = Double(actuel)
-        let totalDouble: Double = Double(total)
-        let result = actuelDouble * 100 / totalDouble
-        return Int(result)
+    func getDynamicLifeBar() -> String {
+        // A - Percent as a string
+        let percentLeft: Int = getPercentLeft()
+        let percentAsString = " " + String(percentLeft) + "%"
+        // B - Percent as a picture
+        let barLenght: Int = 28
+        let visualModel: [(Percent: Int, Block: String)] =
+        [(60, "🟩"), (40, "🟨"), (20, "🟧"),(0, "🟥")]
+        var lifeBar: String = ""
+        for step in visualModel {
+            if  percentLeft >= step.Percent {
+                let coloredBlockNumber: Int = percentLeft * barLenght / 100
+                let blanckBlockNumber: Int = barLenght - coloredBlockNumber
+                lifeBar.append(String(repeating: step.Block, count: coloredBlockNumber))
+                lifeBar.append(String(repeating: "⬜️", count: blanckBlockNumber))
+                break
+            }
+        }
+        return lifeBar + percentAsString
     }
     
 }
@@ -240,15 +264,11 @@ extension Toon {
     
     func getRandomName() -> String {
         var randomName: String
-        if self.gender == .isMan {
-            Toon.defaultNameForMan.shuffle()
-            randomName = Toon.defaultNameForMan.first!
-            Toon.defaultNameForMan.removeFirst()
-        } else {
-            Toon.defaultnameForWoman.shuffle()
-            randomName = Toon.defaultnameForWoman.first!
-            Toon.defaultnameForWoman.removeFirst()
-        }
+        var rightArray = self.gender == .isMan ?
+            Toon.defaultNameForMan : Toon.defaultnameForWoman
+        rightArray.shuffle()
+        randomName = rightArray.first!
+        rightArray.removeFirst()
         return randomName
     }
     

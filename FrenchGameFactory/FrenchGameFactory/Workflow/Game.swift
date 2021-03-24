@@ -15,7 +15,7 @@ class Game {
     var mode: Mode
     var level: Level = .isDefault
     var player: (main: Player, second: Player)
-    var order: [Player] = []
+    var queueSaver: [Player] = []
     
     init(){
         // MARK: A - MODE
@@ -63,17 +63,18 @@ class Game {
     }
     
     func run(){
-        orderPlayers()
-        chooseToons()
+        orderStep()
+        chooseStep()
+        fightStep()
     }
 }
 
 // MARK: E - ORDER PLAYERS
 extension Game {
-    private func orderPlayers(){
+    private func orderStep(){
         Console.newSection()
         Console.write(0, 0, """
-            OK \(player.main.name), two teams will now be made.
+            Ok \(player.main.name), two teams will now be made.
             Choosing toons first is penalized by shooting second.
             """)
         Console.write(1, 1, """
@@ -83,7 +84,7 @@ extension Game {
             3. 🎲 I'd rather roll the dice and let chance decide
             """, 1)
         let orderPrompt: Int = Console.getIntInput(fromTo: 1...3)
-        order =
+        queueSaver =
             orderPrompt == 1 ? [player.main, player.second] :
             orderPrompt == 2 ? [player.second, player.main] :
             [player.main, player.second].shuffled()
@@ -92,27 +93,24 @@ extension Game {
 
 // MARK: F - CHOOSE TOONS
 extension Game {
-    private func chooseToons(){
-        let firstToChoose: Player = order[0]
-        let secondToChose: Player = order[1]
+    private func chooseStep(){
+        let firstToChoose: Player = queueSaver[0]
+        let secondToChose: Player = queueSaver[1]
         if self.mode == .isVersusHuman {
-            // A - First is Human 
-            _humanChoose(forPlayer: firstToChoose)
-            // B - Second player is Human
+            // A - First Player is Human ; B - Second is Human
+            _chooseStep_humanChoose(forPlayer: firstToChoose)
             let header = "OK, \(secondToChose.name), it's your turn now."
-            _humanChoose(forPlayer: secondToChose, withHeader: header)
+            _chooseStep_humanChoose(forPlayer: secondToChose, withHeader: header)
         } else {
             if let machine = firstToChoose as? Machine {
-                // A - First player is Machine
-                _machineChoose(forPlayer: machine)
-                // B - Second player is Human
-                _humanChoose(forPlayer: secondToChose)
+                // A - First player is Machine ; B - Second is Human
+                _chooseStep_machineChoose(forPlayer: machine)
+                _chooseStep_humanChoose(forPlayer: secondToChose)
             }
             else {
-                // A - First player is Human
-                _humanChoose(forPlayer: firstToChoose)
-                // B - Second player is Machine
-                _machineChoose(forPlayer: secondToChose)
+                // A - First player is Human ; B - Second is Machine
+                _chooseStep_humanChoose(forPlayer: firstToChoose)
+                _chooseStep_machineChoose(forPlayer: secondToChose)
             }
         }
         // C - Show both teams
@@ -121,7 +119,7 @@ extension Game {
         _ = firstToChoose.listAllToons(aliveOnly: false)
         _ = secondToChose.listAllToons(aliveOnly: false)
     }
-    private func _humanChoose(forPlayer human: Player, withHeader header: String? = nil){
+    private func _chooseStep_humanChoose(forPlayer human: Player, withHeader header: String? = nil){
         let defaultHeader: String = """
             Ok \(human.name), time is to choose your toons.
             You must pick one Engineer, one Military and one Medical.
@@ -139,14 +137,14 @@ extension Game {
             var maxPromptID: Int = 0
             for toon in toonType.all {
                 if !toon.isInTeam {
-                    maxPromptID += 1 ; toon.ID = maxPromptID
+                    maxPromptID += 1 ; toon.promptID = maxPromptID
                     Console.write(0, 1, toon.getFirstPromptInfos(), 0)
-                } else {toon.ID = 0}
+                } else {toon.promptID = 0}
             }
             // B - Prompt to choose a toon by its ID
             Console.emptyLine()
             let promptForNumber: Int = Console.getIntInput(fromTo: 1...maxPromptID)
-            let chosenToon: Toon = toonType.all.first(where: {$0.ID == promptForNumber})!
+            let chosenToon: Toon = toonType.all.first(where: {$0.promptID == promptForNumber})!
             // C - Prompt to choose a name for this toon
             var promptForName: String = ""
             while true {
@@ -159,7 +157,7 @@ extension Game {
             human.toons.append(chosenToon)
         }
     }
-    private func _machineChoose(forPlayer machine: Player) {
+    private func _chooseStep_machineChoose(forPlayer machine: Player) {
         var results: [(ID: Int, globalSet: Double)] = []
         let toonClasses = [Engineer.All, Military.All, Medical.All]
         for toonClass in toonClasses { // For each class of toons
@@ -167,9 +165,9 @@ extension Game {
             var maxPromptID: Int = 0
             for toon in toonClass {
                 if !toon.isInTeam {
-                    maxPromptID += 1 ; toon.ID = maxPromptID
-                    results.append((toon.ID, toon.globalSet))
-                } else {toon.ID = 0}
+                    maxPromptID += 1 ; toon.promptID = maxPromptID
+                    results.append((toon.promptID, toon.globalSet))
+                } else {toon.promptID = 0}
             }
             // B - Order this array according to the level
             switch level {
@@ -178,7 +176,7 @@ extension Game {
             default: results.shuffle() // Simple shuffle
             }
             // C - Pick the toon at the top [0] index
-            let rightToon = toonClass.first(where: {$0.ID == results[0].ID} )!
+            let rightToon = toonClass.first(where: {$0.promptID == results[0].ID} )!
             rightToon.name = rightToon.getRandomName().uppercased() // Get a random 1900' style name
             rightToon.isInTeam = true
             machine.toons.append(rightToon)
@@ -191,67 +189,66 @@ extension Game {
 // MARK: F - FIGHT
 extension Game {
     
-    private func fight() {
+    private func fightStep() {
         
-        fightResetToonsID()
+        Toon.resetAllPromptID()
         var round: Int = 0
         repeat {
             round += 1
             // A - Pick one player
-            order.swapAt(0, 1) // Swap players at each round
-            let (attacker, defender) = (order[0], order[1]) // Get the first player
+            queueSaver.swapAt(0, 1) // Swap players at each round
+            let (attacker, defender) = (queueSaver[0], queueSaver[1])
             
             // B - Lists all toons
-            fightListToons(of: attacker, with: "OK \(attacker.name), pick your champion :")
+            let header: String = "Ok \(attacker.name), pick one of your champions :"
+            _ = attacker.listAllToons(aliveOnly: false, header: header)
             // C - Choose one toon
-            let choosenToon: Toon = fightPickToon(of: attacker)
+            let choosenToon: Toon = _fightStep_chooseToon(of: attacker)
             // D - Heal
-            let usedHeal: Bool = fightDoMedicine(of: attacker, with: choosenToon)
-            if usedHeal { break }
+            let toonDidMedicine: Bool = _fightStep_DoMedicine(of: attacker, with: choosenToon)
+            if toonDidMedicine { break }
             
-        } while fightCanContinue()
+        } while _fightStep_CanContinue()
     }
     
-
-    private func fightResetToonsID() {
-        for player in ([player.main, player.second]) { // For each player
-            for index in 0...player.toons.count {
-                player.toons[index].ID = index + 1
-            }
-        }
-    }
-    private func fightListToons(of player: Player, with header: String) {
-        Console.write(0, 1, header)
-        for currentToon in player.toons {
-            Console.write(0, 1, currentToon.getFightInfos())
-        }
-    }
-    private func fightPickToon(of player: Player) -> Toon {
+    private func _fightStep_chooseToon(of player: Player) -> Toon {
         while true {
             let promptForNumber = Console.getIntInput(fromTo: 1...player.toons.count)
-            let choosenToon = player.toons.first(where: { $0.ID == promptForNumber })!
+            let choosenToon = player.toons.first(where: { $0.promptID == promptForNumber })!
             if !choosenToon.isAlive() {
-                Console.write(1, 1, choosenToon.getPicWithName() + " can't fight anymore", 1)
+                Console.write(1, 1, choosenToon.getPicWithName() + " can't fight : too many damages taken", 1)
             } else { return choosenToon }
         }
     }
-    private func fightDoMedicine(of player: Player, with choosenToon: Toon) -> Bool {
-        guard let doctor = choosenToon as? Medical else {
-           return false
+    private func _fightStep_DoMedicine(of player: Player, with choosenToon: Toon) -> Bool {
+        // A - Quit if toon is not a Medical
+        guard let doctor = choosenToon as? Medical else { return false }
+        // B - Prepare prompt text
+        let pack: [Medicine] = doctor.medicalPack
+        var promptID: Int = 0 ; var promptText: String = ""
+        for index in 0...2 {
+            if pack[index].usage.wasUsed < pack[index].usage.wasUsed {
+                promptID += 1 ; pack[index].promptID = promptID
+                promptText += "\(promptID). Use a \(pack[index].getPicWithName()) : \(pack[index].usage)\n"
+            } else { pack[index].promptID = 0 }
         }
+        let weaponPromptID: Int = promptID + 1 ; let maxPromptID = weaponPromptID
+        promptText += "\(weaponPromptID). Use \(doctor.weapon!.getPicWithName()) : it blows haters to smithereens"
+        // C - Call prompt and get result
         Console.write(1, 1, """
             What do you want to do with \(doctor.name!) ?
-            1. Bring medical help to my team
-            2. \(doctor.weapon!.pic) Blow the enemy to smithereens
-            """)
-        let promptForNumber = Console.getIntInput(fromTo: 1...2)
-        
-        
+            \(promptText)
+            """, 1)
+        let promptForNumber = Console.getIntInput(fromTo: 1...maxPromptID)
+        if promptForNumber == weaponPromptID {return false}
+        _fightStep_ApplyMedecine(withID: promptForNumber)
         return true
+    }
+    private func _fightStep_ApplyMedecine(withID promptID:Int) {
         
         
     }
-    private func fightCanContinue() -> Bool {
+    private func _fightStep_CanContinue() -> Bool {
         for player in ([player.main, player.second]) { // For each player
             if !player.toons.allSatisfy({ $0.lifeSet.hitpoints == 0 }) {
                 return true // Continue

@@ -87,7 +87,7 @@ class Console {
             do {
                 let rawInput = try getRawInput()
                 guard let intInput: Int = Int(rawInput) else {
-                    Console.write(1, 1, "⚠️ No number was found : \(randomError) ⚠️", 1)
+                    Console.write(1, 1, "⚠️ Expected number was not found : \(randomError) ⚠️", 1)
                     continue
                 }
                 guard range.contains(intInput) else {

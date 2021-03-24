@@ -24,20 +24,20 @@ class Player {
         self.ID = Player.GetNewID()
     }
     
-    func listAllToons(aliveOnly: Bool, header: String? = nil) -> ClosedRange<Int> {
+    func listAllToons(aliveOnly: Bool, header: String? = nil, withBar: Bool = true) -> ClosedRange<Int> {
         // Header
         let header: String = header ?? "Team of \(self.name) :"
         Console.write(1, 1, header,0)
         // Body
         var body:String = ""
-        var currentPromptIndex = 0
+        var currentPromptID = 0
         for toon in self.toons {
-            if aliveOnly == true && !toon.isAlive() {continue}
-            currentPromptIndex += 1
-            toon.ID = currentPromptIndex
-            body.append( toon.getFightInfos() + "\n" + toon.getLifeBar()  + "\n")
+            if aliveOnly == true && !toon.isAlive() { toon.promptID = 0 ; continue }
+            currentPromptID += 1 ; toon.promptID = currentPromptID
+            body.append(toon.getFightInfos() + "\n")
+            if withBar { body.append(toon.getDynamicLifeBar()  + "\n")}
         }
         Console.write(0, 1, body)
-        return 1...currentPromptIndex
+        return 1...currentPromptID
     }
 }

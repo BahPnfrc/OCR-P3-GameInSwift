@@ -11,6 +11,7 @@ enum MedicineType { case isLight, iSMedium, isHeavy }
 
 final class Medicine : Tool {
     
+    var promptID: Int = 0
     let type: MedicineType
     var about: String = ""
     var usage: (
@@ -38,19 +39,19 @@ final class Medicine : Tool {
                 withName: "Savage Bandage",
                 withType: .isLight,
                 withUsage: (0, 2),
-                withAbout: "Boost receiver hitpoints to 70%")
+                withAbout: "it restores receiver health to 70%")
         let medium: Medicine = Medicine(
                 withPic: "💊",
                 withName: "Precision Pill",
                 withType: .iSMedium,
                 withUsage: (0, 1),
-                withAbout: "Boost receiver hitpoints to 90%")
+                withAbout: "it restores receiver health to 90%")
         let heavy: Medicine = Medicine(
                 withPic: "🧬",
                 withName: "Dna Denaturator",
                 withType: .isHeavy,
                 withUsage: (0, 1),
-                withAbout: "Boost all toons hitpoints to 50%")
+                withAbout: "it restores all toons health to 50%")
         return [light, medium, heavy]
     }
     
