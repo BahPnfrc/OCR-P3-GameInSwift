@@ -22,6 +22,7 @@ extension LifeSet {
         let actuelDouble: Double = Double(getHitPointsLeft())
         let totalDouble: Double = Double(Setting.Toon.defaultLifeSet.hitpoints)
         let result = actuelDouble * 100 / totalDouble
+        if result < 1 { return 0}
         return Int(result)
     }
     func isAlive() -> Bool {return lifeSet.hitpoints > 0}
@@ -67,9 +68,12 @@ extension FightSet {
 }
 
 protocol StatSet {
-    var roundPlayed: Int {get set}
-    var damage: (received: Int, given: Int, bestHit: Int) {get set}
-    var medecine: (received: Int, given: Int) {get set}
+    var statSet: (
+        roundPlayed: Int,
+        totalDamage: (received: Int, given: Int),
+        bestDamage: (received: Int, given: Int),
+        medecine: (received: Int, given: Int)
+    ) {get set}
 }
 
 // MARK: Enumations
@@ -81,8 +85,8 @@ enum Age: String, CaseIterable {
 }
 
 // MARK: Class
-class Toon: LifeSet, SkillSet, FightSet {
-    
+class Toon: LifeSet, SkillSet, FightSet, StatSet {
+
     let ID: Int
     var promptID: Int = 0
     let gender: Gender
@@ -132,6 +136,17 @@ class Toon: LifeSet, SkillSet, FightSet {
     lazy var globalFightSet: Double = getGlobalFightSet()
     lazy var globalSet: Double = globalSkillSet * globalFightSet
     
+    // MARK: StatSet
+    var statSet:
+        (roundPlayed: Int,
+         totalDamage: (received: Int, given: Int),
+         bestDamage: (received: Int, given: Int),
+         medecine: (received: Int, given: Int))
+        = (0,
+           (0, 0),
+           (0, 0),
+           (0, 0))
+     
     // MARK: Init
     init(
         withID id: Int,
@@ -205,6 +220,10 @@ extension Toon { //
         return getFightInfos() + "\n" + getDynamicLifeBar() + "\n"
     }
     
+    func getHitpointsAndPercent() -> String {
+        return "\(self.lifeSet.hitpoints) hitpoints left : \(getPercentLeft())%"
+    }
+    
     func getStaticLifeBar() -> String {
         // A - Percent as a string
         var percentLeft: Int = getPercentLeft()
@@ -243,9 +262,10 @@ extension Toon { //
                 let blanckBlockNumber: Int = barLenght - coloredBlockNumber
                 lifeBar.append(String(repeating: step.Block, count: coloredBlockNumber))
                 lifeBar.append(String(repeating: "⬜️", count: blanckBlockNumber))
-                break
+                return lifeBar + percentAsString
             }
         }
+        lifeBar.append(String(repeating: "⬜️", count: barLenght))
         return lifeBar + percentAsString
     }
     

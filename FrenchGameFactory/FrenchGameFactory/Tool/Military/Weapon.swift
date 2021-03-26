@@ -55,6 +55,18 @@ class Weapon : Tool, DamageSet {
             modifierSet.forSenior
     }
 
+    static func getDamage(from attacker: Toon, to defender: Toon) -> Double {
+        let biologicDamage: Double = attacker.weapon!.getBiologicDamage()
+            * attacker.getBiologicAttack() / defender.getBiologicDefense()
+        let kineticDamage: Double = attacker.weapon!.getKineticDamage()
+            * attacker.getKineticAttack() / defender.getKineticDefense()
+        let thermicDamage: Double = attacker.weapon!.getThermicDamage()
+            * attacker.getThermicAttack() / defender.getThermicDefense()
+        let damage: Double = (biologicDamage + kineticDamage + thermicDamage)
+            * attacker.getStrenght() / defender.getAgility()
+            * attacker.getAccuracy() / defender.getForsight()
+        return damage
+    }
 }
 
 

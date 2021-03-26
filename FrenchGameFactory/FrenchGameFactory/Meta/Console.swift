@@ -79,7 +79,7 @@ class Console {
     
     // MARK: Int input
     private static func promptForIntInput(_ range: ClosedRange<Int>) {
-        Console.write(0, 0, "➡️ Type a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' to confirm ✅", 0)
+        Console.write(0, 0, "➡️ Type a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' to continue ✅", 0)
     }
     static func getIntInput(fromTo range: ClosedRange<Int>) -> Int {
         repeat {
@@ -104,7 +104,7 @@ class Console {
     
     // MARK: String input
     private static func promptForStringInput(_ required: String) {
-        Console.write(0, 0, "➡️ Type \(required) and press 'Enter' to confirm ✅", 0)
+        Console.write(0, 0, "➡️ Type \(required) and press 'Enter' to continue ✅", 0)
     }
     private static func contentCheck(content string: String, check charactereSet: CharacterSet) -> Bool {
         let range = string.rangeOfCharacter(from: charactereSet)
