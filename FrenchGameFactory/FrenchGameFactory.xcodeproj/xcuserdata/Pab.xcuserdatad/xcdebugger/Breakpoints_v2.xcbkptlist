@@ -71,22 +71,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "64000452-2F6D-4A0A-8AF9-76708B1F7A1B"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FrenchGameFactory/Toon/Toon.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "241"
-            endingLineNumber = "241"
-            landmarkName = "getStaticLifeBar()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "B8E7F079-602A-4A8C-AE2B-12D397D02334"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -142,9 +126,9 @@
             filePath = "FrenchGameFactory/Toon/Toon.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "259"
-            endingLineNumber = "259"
-            landmarkName = "getDynamicLifeBar()"
+            startingLineNumber = "243"
+            endingLineNumber = "243"
+            landmarkName = "getLifeBar(withBlocks:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -190,8 +174,8 @@
             filePath = "FrenchGameFactory/Workflow/Game.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "296"
-            endingLineNumber = "296"
+            startingLineNumber = "297"
+            endingLineNumber = "297"
             landmarkName = "_fightStep_isDoctor_ApplyMedecine(ofPlayer:withID:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -206,41 +190,9 @@
             filePath = "FrenchGameFactory/Toon/Toon.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "260"
-            endingLineNumber = "260"
-            landmarkName = "getDynamicLifeBar()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "0BAD6327-B398-4540-8B0C-863114567EBE"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FrenchGameFactory/Tool/Medical/Medicine.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "75"
-            endingLineNumber = "75"
-            landmarkName = "_restoreHitpoints(ofToon:to:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "16107B8F-D82B-406A-8726-BEF3CA6CCF69"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FrenchGameFactory/Tool/Medical/Medicine.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "66"
-            endingLineNumber = "66"
-            landmarkName = "useMediumOrLightMedicine(medicine:onToon:)"
+            startingLineNumber = "244"
+            endingLineNumber = "244"
+            landmarkName = "getLifeBar(withBlocks:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

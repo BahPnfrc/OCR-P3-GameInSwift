@@ -34,8 +34,8 @@ class Player {
         for toon in self.toons {
             if aliveOnly == true && !toon.isAlive() { toon.promptID = 0 ; continue }
             currentPromptID += 1 ; toon.promptID = currentPromptID
-            body.append(toon.getFightInfos() + "\n")
-            if withBar { body.append(toon.getDynamicLifeBar()  + "\n")}
+            body.append(toon.getFightPrompt() + "\n")
+            if withBar { body.append(toon.getLifeBar()  + "\n")}
         }
         Console.write(0, 1, body)
         return 1...currentPromptID

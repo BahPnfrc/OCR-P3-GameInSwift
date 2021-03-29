@@ -149,7 +149,7 @@ extension Game {
             for toon in toonType.all {
                 if !toon.isInTeam {
                     maxPromptID += 1 ; toon.promptID = maxPromptID
-                    Console.write(0, 1, toon.getFirstPromptInfos(), 0)
+                    Console.write(0, 1, toon.getChooseToonPrompt(), 0)
                 } else {toon.promptID = 0}
             }
             // B - Prompt to choose a toon by its ID
@@ -227,7 +227,7 @@ extension Game {
                 let reportHeader = "Here is \(attackingPlayer.name)'s Team after medication ⛑ :"
                 _ = attackingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
             } else {
-                let reportHeader = "Here is \(defendingPlayer.name)'s Team after this blow 🥊 :"
+                let reportHeader = "Here is \(defendingPlayer.name)'s Team after this blow 🪖 :"
                 _ = defendingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
             }
             // F - Prompt to continue
@@ -282,9 +282,10 @@ extension Game {
     }
     private func _fightStep_isDoctor_ApplyMedecine(ofPlayer doctor: Medical, withID medicineID:Int) {
         let choosenMedicine: Medicine = doctor.medicalPack.first(where: { $0.promptID == medicineID })!
-        if choosenMedicine.type == .isHeavy {
-            choosenMedicine.useHeavyMedicine(medicine: choosenMedicine, onPlayer: attackingPlayer)
+        if let teamUseMedicine = choosenMedicine as? TeamUseMedicine {
+            teamUseMedicine.use(OnTeam: attackingPlayer)
         } else  {
+            let singleUseMedicine = choosenMedicine as! SingleUseMedicine
             var maxPromptID: Int = 0 ; var promptText: String = ""
             for index in 0...attackingPlayer.toons.count - 1 {
                 let toon = attackingPlayer.toons[index]
@@ -294,14 +295,13 @@ extension Game {
                 } else { toon.promptID = 0 }
             }
             Console.write(1, 1, """
-                Who shall receive the \(choosenMedicine.getPicWithName()) ?
+                Who shall receive the \(singleUseMedicine.getPicWithName()) ?
                 \(promptText)
                 """, 0)
             let choosenID = Console.getIntInput(fromTo: 1...maxPromptID)
             let choosenToon = attackingPlayer.toons.first(where: {$0.promptID == choosenID})!
-            choosenMedicine.useMediumOrLightMedicine(medicine: choosenMedicine, onToon: choosenToon)
+            singleUseMedicine.use(onToon: choosenToon)
         }
-        
     }
     private func _fightStep_isElse(withToon toon: Toon) {
         _fightStep_chooseDefenderAndFight(withToon: toon)
@@ -347,10 +347,10 @@ extension Game {
         let expectedDamage = attacker.weapon!.isUpdated == true ?
             Setting.Weapon.expectedUpdatedDamage : Setting.Weapon.expectedBasicDamage
         let (action, result, medal) =
-            (realDamage < (expectedDamage * 0.9)) ? (" scratched " , "causing only ", "#👎 #🥉"):
-            (realDamage < (expectedDamage * 1.1)) ? (" touched " , "amounting for ", "#👍 #🥈") :
-            (" punished " , "wrecking for ", "#💪 #🥇")
-        let attackInfo: String = "ℹ️ " + attacker.getPicWithName() + action + "" + defender.getPicWithName()
+            (realDamage < (expectedDamage * 0.9)) ? (" scratched " , "causing only ", "🥉"):
+            (realDamage < (expectedDamage * 1.1)) ? (" touched " , "amounting for ", "🥈") :
+            (" punished " , "wrecking for ", "🥇")
+        let attackInfo: String = "ℹ️" + attacker.getPicWithName() + action + "" + defender.getPicWithName()
         let weaponInfo: String = "With " + attacker.getHisOrHer() + attacker.weapon!.getPicWithName()
         let resultInfo: String = result + String(Int(realDamage)) + " damages " + medal
         let message: String = attackInfo + "\n" + weaponInfo + " " + resultInfo

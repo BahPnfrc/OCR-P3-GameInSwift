@@ -192,8 +192,15 @@ extension Toon { //
         for toon in Medical.All { toon.promptID = 0 }
     }
     
-    func getHisOrHer() -> String {
-        gender == .isMan ? "his " : "her "
+    func getHeOrShe(withMaj:Bool = false) -> String {
+        gender == .isMan ?
+            (withMaj == true ? "He " : "he") :
+            (withMaj == true ? "She " : "she ")
+    }
+    func getHisOrHer(withMaj:Bool = false) -> String {
+        gender == .isMan ?
+            (withMaj == true ? "His " : "his ") :
+            (withMaj == true ? "Her " : "her ")
     }
     func getAgeWithGender() -> String {
         age.rawValue + " " + gender.rawValue
@@ -204,55 +211,32 @@ extension Toon { //
         }
         return pic + " " + title + " " + name
     }
-    func getFirstPromptInfos() -> String {
+    func getChooseToonPrompt() -> String {
         let name: String = String(promptID) + ". " +  getPicWithName() + " " + gender.rawValue
         let age: String = "A " + self.age.rawValue
-        let tool: String = "armed with " + getHisOrHer() + self.weapon!.getPicWithName()
+        let tool: String = "armed with " + getHisOrHer() + weapon!.getPicWithName()
         return name + " : " + age + " " + tool
     }
-    func getFightInfos() -> String {
+    func getFightPrompt() -> String {
         let name : String = String(promptID) + ". " + getPicWithName()
-        let tool : String = self.weapon!.getPicWithName()
+        let tool : String = weapon!.getPicWithName()
         return name + " with " + getHisOrHer() + tool
     }
     
-    func getFightInfosWithBar() -> String {
-        return getFightInfos() + "\n" + getDynamicLifeBar() + "\n"
+    func getFightPromptWithBar() -> String {
+        return getFightPrompt() + "\n" + getLifeBar() + "\n"
     }
     
     func getHitpointsAndPercent() -> String {
         return "\(self.lifeSet.hitpoints) hitpoints left : \(getPercentLeft())%"
     }
     
-    func getStaticLifeBar() -> String {
-        // A - Percent as a string
-        var percentLeft: Int = getPercentLeft()
-        let percentAsString = " " + String(percentLeft) + "%"
-        // B - Percent as a picture
-        let visualModel: String =
-            String(repeating: "🟥,", count: 4) +
-            String(repeating: "🟧,", count: 4) +
-            String(repeating: "🟨,", count: 4) +
-            String(repeating: "🟩,", count: 15) + "🟩"
-        let model: [String] = visualModel.components(separatedBy: ",")
-        let percentPerBloc = 100 / model.count
-        var lifeBar: String = ""
-        for currentIconIndex in 0...model.count - 1 { // For each icon
-            if percentLeft >= percentPerBloc {
-                lifeBar.append(model[currentIconIndex]) // Add the colored icon
-                percentLeft -= percentPerBloc
-            } else {
-                lifeBar.append("⬜️") // Add a blanck icon
-            }
-        }
-        return lifeBar + percentAsString
-    }
-    func getDynamicLifeBar() -> String {
+    func getLifeBar(withBlocks blocks: Int = 28) -> String {
         // A - Percent as a string
         let percentLeft: Int = getPercentLeft()
         let percentAsString = " " + String(percentLeft) + "%"
         // B - Percent as a picture
-        let barLenght: Int = 28
+        let barLenght: Int = blocks
         let visualModel: [(Percent: Int, Block: String)] =
         [(60, "🟩"), (40, "🟨"), (20, "🟧"),(0, "🟥")]
         var lifeBar: String = ""
