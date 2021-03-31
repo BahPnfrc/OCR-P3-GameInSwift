@@ -72,7 +72,7 @@ protocol StatSet {
         roundPlayed: Int,
         totalDamage: (received: Int, given: Int),
         bestDamage: (received: Int, given: Int),
-        medecine: (received: Int, given: Int)
+        medicine: (received: Int, given: Int)
     ) {get set}
 }
 
@@ -81,7 +81,7 @@ enum Gender: String, CaseIterable {
     case isMan = "man", isWoman = "woman"
 }
 enum Age: String, CaseIterable {
-    case isJunior = "mid 30'", isAdult = "mid 40'", isSenior = "mid 50'"
+    case isJunior = "30'", isAdult = "40'", isSenior = "50'"
 }
 
 // MARK: Class
@@ -141,7 +141,7 @@ class Toon: LifeSet, SkillSet, FightSet, StatSet {
         (roundPlayed: Int,
          totalDamage: (received: Int, given: Int),
          bestDamage: (received: Int, given: Int),
-         medecine: (received: Int, given: Int))
+         medicine: (received: Int, given: Int))
         = (0,
            (0, 0),
            (0, 0),
@@ -213,8 +213,8 @@ extension Toon { //
     }
     func getChooseToonPrompt() -> String {
         let name: String = String(promptID) + ". " +  getPicWithName() + " " + gender.rawValue
-        let age: String = "A " + self.age.rawValue
-        let tool: String = "armed with " + getHisOrHer() + weapon!.getPicWithName()
+        let age: String = "a " + self.age.rawValue
+        let tool: String = "with " + getHisOrHer() + weapon!.getPicWithName()
         return name + " : " + age + " " + tool
     }
     func getFightPrompt() -> String {

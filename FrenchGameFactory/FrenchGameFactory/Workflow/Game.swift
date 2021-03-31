@@ -7,6 +7,28 @@
 
 import Foundation
 
+extension String {
+    func withNum() -> String {
+        var result: String = self
+        let changeSet: [(from: String, to: String)] =
+            [("0", "0️⃣"), ("1", "1️⃣"), ("2", "2️⃣"), ("3", "3️⃣"), ("4", "4️⃣"),
+             ("5", "5️⃣"), ("6", "6️⃣"), ("7", "7️⃣"), ("8", "8️⃣"), ("9", "9️⃣")]
+        for change in changeSet {
+            result = result.replacingOccurrences(of: change.from, with: change.to)
+        }
+        return result
+    }
+    func withEmo() -> String {
+        var result: String = self
+        let changeSet: [(from: String, to: String)] =
+            [("woman ", "🚺 "), ("man ","🚹 ")]
+        for change in changeSet {
+            result = result.replacingOccurrences(of: change.from, with: change.to)
+        }
+        return result
+    }
+}
+
 enum Mode: CaseIterable { case isVersusHuman, isVersusMachine }
 enum Level: CaseIterable { case isDefault, isEasy, isMedium, isHard }
 
@@ -18,6 +40,7 @@ class Game {
     
     private var queue: [Player] = []
     private func switchPlayers() { self.queue.swapAt(0, 1)}
+    
     var attackingPlayer: Player { return queue[0]}
     var defendingPlayer: Player { return queue[1]}
     
@@ -30,7 +53,7 @@ class Game {
             How do you want to play ?
             1. 🧠 Against a friend
             2. ⚙️ Against the machine
-            """, 1)
+            """.withNum(), 1)
         let modePrompt:Int =
             !isRunningTest ? Console.getIntInput(fromTo: 1...2) : 2 // #TEST
         mode = modePrompt == 1 ? .isVersusHuman: .isVersusMachine
@@ -62,7 +85,7 @@ class Game {
                 1. 🌸 Easy. Because you're soft and delicate
                 2. 🏓 Medium. For a real one on one baby
                 3. 🪖 Hard. Can't fight the dust !
-                """, 1)
+                """.withNum(), 1)
             let levelPrompt: Int =
                 !isRunningTest ? Console.getIntInput(fromTo: 1...3) : 3 // #TEST
             level =
@@ -94,7 +117,7 @@ extension Game {
             1. 🏆 I want to choose first no matter what
             2. 🎳 I'd prefer to shoot first so I'll choose second
             3. 🎲 I'd rather roll the dice and let chance decide
-            """, 1)
+            """.withNum(), 1)
         let orderPrompt: Int =
             !isRunningTest ? Console.getIntInput(fromTo: 1...3) : 2
         queue =
@@ -144,14 +167,16 @@ extension Game {
         for toonType in toonTypes { // For each type of toon
             testIndex += 1
             // A - Show message and list all toons
+            var promptText: String = ""
             Console.write(1, 1, toonType.message, 0)
             var maxPromptID: Int = 0
             for toon in toonType.all {
                 if !toon.isInTeam {
                     maxPromptID += 1 ; toon.promptID = maxPromptID
-                    Console.write(0, 1, toon.getChooseToonPrompt(), 0)
+                    promptText += toon.getChooseToonPrompt() + "\n"
                 } else {toon.promptID = 0}
             }
+            Console.write(0, 1, promptText.withNum().withEmo(), 0)
             // B - Prompt to choose a toon by its ID
             Console.emptyLine()
             let promptForNumber: Int =
@@ -195,6 +220,7 @@ extension Game {
             machine.toons.append(rightToon)
             results.removeAll() // For next loop
         }
+        
     }
     
 }
@@ -205,14 +231,14 @@ extension Game {
     private func fightStep() {
         Toon.resetAllPromptID()
         var counter: Int = 0
-        var round: Int = 1
+        var round: Int = 0
         repeat {
             counter += 1
-            if counter % 2 == 0 {round += 1}
+            if (counter - 1).isMultiple(of: 2) {round += 1}
             Console.newSection()
             // A - Pick one player
             switchPlayers() // Attacker and defender are switched
-            Console.write(0, 0, "🔔 *Ding Ding* : Round \(round) of \(attackingPlayer.name), Fight 🥊 !", 0)
+            Console.write(0, 0, "🔔 *Ding Ding* : Round \(round) of \(attackingPlayer.name), Fight 🥊 !".withNum(), 0)
             // B - Lists all toons
             let listHeader: String = "Ok \(attackingPlayer.name), pick one of your champions :"
             _ = attackingPlayer.listAllToons(aliveOnly: false, header: listHeader)
@@ -231,8 +257,8 @@ extension Game {
                 _ = defendingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
             }
             // F - Prompt to continue
-            let continuePrompt: String =  Console.getStringInput(prompt: "anything", space: true, digit:  true)
-            if continuePrompt == "quit" { break }
+            let exitPrompt: Bool =  Console.getExitPrompt(exitWord: "exit")
+            if exitPrompt == true { break }
         } while _fightStep_CanContinue()
         
     }
@@ -242,7 +268,7 @@ extension Game {
             let promptForNumber = Console.getIntInput(fromTo: 1...player.toons.count)
             let choosenToon = player.toons.first(where: { $0.promptID == promptForNumber })!
             if !choosenToon.isAlive() {
-                Console.write(1, 1, choosenToon.getPicWithName() + " can't fight : too many damages taken 🥊 !", 1)
+                Console.write(1, 1, choosenToon.getPicWithName() + " can't fight : \(choosenToon.getHeOrShe())'s knocked out 🥊", 1)
             } else { return choosenToon }
         }
     }
@@ -281,9 +307,10 @@ extension Game {
         return true
     }
     private func _fightStep_isDoctor_ApplyMedecine(ofPlayer doctor: Medical, withID medicineID:Int) {
+        var restoredHitpoints: Int // #STAT
         let choosenMedicine: Medicine = doctor.medicalPack.first(where: { $0.promptID == medicineID })!
         if let teamUseMedicine = choosenMedicine as? TeamUseMedicine {
-            teamUseMedicine.use(OnTeam: attackingPlayer)
+            restoredHitpoints = teamUseMedicine.use(OnTeam: attackingPlayer) // #STAT
         } else  {
             let singleUseMedicine = choosenMedicine as! SingleUseMedicine
             var maxPromptID: Int = 0 ; var promptText: String = ""
@@ -300,8 +327,9 @@ extension Game {
                 """, 0)
             let choosenID = Console.getIntInput(fromTo: 1...maxPromptID)
             let choosenToon = attackingPlayer.toons.first(where: {$0.promptID == choosenID})!
-            singleUseMedicine.use(onToon: choosenToon)
+            restoredHitpoints = singleUseMedicine.use(onToon: choosenToon) // #STAT
         }
+        doctor.statSet.medicine.given += restoredHitpoints // #STAT
     }
     private func _fightStep_isElse(withToon toon: Toon) {
         _fightStep_chooseDefenderAndFight(withToon: toon)
@@ -365,12 +393,58 @@ extension Game {
     // MARK: G - STAT
     func statStep() {
         
+        player.main.finalScore = _statStep_AverageScore(OfPlayer: player.main)
+        player.second.finalScore = _statStep_AverageScore(OfPlayer: player.second)
+        let result: (winner: Player, loser: Player) =
+            player.main.finalScore > player.second.finalScore ?
+            (player.main, player.second) : (player.second, player.main)
+            
+        let allToons = player.main.toons + player.second.toons
+        let mostDamageGiven: [Toon] = allToons.sorted {$0.statSet.totalDamage.given > $1.statSet.totalDamage.given}
+        let bestDamageGiven : [Toon]  = allToons.sorted {$0.statSet.bestDamage.given > $1.statSet.bestDamage.given}
+        let mostMedicineGiven: [Toon] = allToons.sorted {$0.statSet.medicine.given > $1.statSet.medicine.given}
+        
+        let Medals: [String] = ["🥇", "🥈", "🥉"]
+        var mostDamageGivenRank: String = ""
+        var bestDamageGivenRank: String = ""
+        var mostMedicineGivenRank: String = ""
+        for index in 0...2 {
+            mostDamageGivenRank += Medals[index] + " - " + mostDamageGiven[index].getPicWithName() + " : "
+                + String(mostDamageGiven[index].statSet.totalDamage.given) + " hitpoints taken\n"
+            bestDamageGivenRank += Medals[index] + " - " + bestDamageGiven[index].getPicWithName() + " : "
+                + String(bestDamageGiven[index].statSet.bestDamage.given) + " hitpoints taken\n"
+        }
+        for index in 0...1 {
+            mostMedicineGivenRank += Medals[index] + " - " + mostMedicineGiven[index].getPicWithName() + " : "
+                + String(mostMedicineGiven[index].statSet.medicine.given) + " hitpoints saved\n"
+        }
+        
+        let rank:String = """
+            They made History today 🏆 :
+            🏁 - \(result.winner.name) : \(result.winner.finalScore) damages given
+            🏳️ - \(result.loser.name) : \(result.loser.finalScore) damages given
+
+            Best unique damage dealer 🎯 :
+            \(bestDamageGivenRank)
+            Best global damage dealer 🕑 :
+            \(mostDamageGivenRank)
+            Best medicine dealer 🌡 :
+            \(mostMedicineGivenRank)
+            """
+        Console.write(1, 1, rank, 0)
         
     }
-    // MARK: G - END OF GAME
-    func endOfGame() {
-        
-        
+    private func _statStep_AverageScore(OfPlayer player: Player) -> Int {
+        var global:Int = 0
+        for toon in player.toons { global += toon.statSet.totalDamage.given + toon.statSet.medicine.received }
+        return global
     }
     
+    
+    
+    
+    // MARK: G - END OF GAME
+    func endOfGame() {
+        Console.write(1, 0, "END OF THE GAME", 0)
+    }
 }

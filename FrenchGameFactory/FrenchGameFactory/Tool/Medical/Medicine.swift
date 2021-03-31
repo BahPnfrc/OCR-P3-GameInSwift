@@ -33,11 +33,12 @@ class Medicine : Tool {
             withName: name)
     }
     
-    func restoreHitpoints(ofToon toon: Toon, to expectedHitpoints: Int) -> Int {
+    func restoreHitpointsAndStats(ofToon toon: Toon, to expectedHitpoints: Int) -> Int {
         let currentHitpoints: Int = toon.lifeSet.hitpoints
         if currentHitpoints < expectedHitpoints {
             let restoredHitpoints: Int = expectedHitpoints - currentHitpoints
-            toon.lifeSet.hitpoints = expectedHitpoints
+            toon.statSet.medicine.received += restoredHitpoints // #STAT
+            toon.lifeSet.hitpoints += restoredHitpoints
             return restoredHitpoints
         } else { return 0 }
     }

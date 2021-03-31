@@ -18,6 +18,7 @@ class Player {
     var ID: Int
     var name: String
     var toons: [Toon] = []
+    var finalScore: Int = 0
         
     init(named name: String) {
         self.name = name

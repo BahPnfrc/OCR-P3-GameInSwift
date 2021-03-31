@@ -79,7 +79,9 @@ class Console {
     
     // MARK: Int input
     private static func promptForIntInput(_ range: ClosedRange<Int>) {
-        Console.write(0, 0, "➡️ Type a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' to continue ✅", 0)
+        Console.write(0, 0,
+        "➡️ Type a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' to continue ✅".withNum(),
+        0)
     }
     static func getIntInput(fromTo range: ClosedRange<Int>) -> Int {
         repeat {
@@ -91,7 +93,7 @@ class Console {
                     continue
                 }
                 guard range.contains(intInput) else {
-                    Console.write(1, 1, "⚠️ \(intInput) is not expected : \(randomError) ⚠️", 1)
+                    Console.write(1, 1, "⚠️ \(intInput) is not expected : \(randomError) ⚠️".withNum(), 1)
                     continue
                 }
                 return intInput
@@ -132,5 +134,10 @@ class Console {
                 continue
             }
         } while true
+    }
+    static func getExitPrompt(exitWord:String) -> Bool {
+        Console.write(0, 0, "➡️ Type '\(exitWord)' to exit ❎ or press 'Enter' to continue ✅", 0)
+        guard let typedText = readLine() else { return false }
+        return typedText == exitWord
     }
 }
