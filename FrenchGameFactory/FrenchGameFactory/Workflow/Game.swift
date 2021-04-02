@@ -44,7 +44,7 @@ class Game {
     var attackingPlayer: Player { return queue[0]}
     var defendingPlayer: Player { return queue[1]}
     
-    var isRunningTest: Bool = true // #TEST
+    var isRunningTest: Bool = false // #TEST
     
     init(){
         // MARK: A - MODE
@@ -257,6 +257,7 @@ extension Game {
                 }
                 
             } else {
+                
                 // B - Lists all toons
                 let listHeader: String = "Ok \(attackingPlayer.name), pick one of your champions :"
                 _ = attackingPlayer.listAllToons(aliveOnly: false, header: listHeader)
@@ -274,10 +275,11 @@ extension Game {
                     let reportHeader = "Here is \(defendingPlayer.name)'s Team after this blow 🪖 :"
                     _ = defendingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
                 }
-                // F - Prompt to continue
-                let exitPrompt: Bool =  Console.getExitPrompt(exitWord: "exit")
-                if exitPrompt == true { break }
             }
+            
+            // F - Prompt to continue
+            let exitPrompt: Bool =  Console.getExitPrompt(exitWord: "exit")
+            if exitPrompt == true { break }
             
         } while _fightStep_CanContinue()
         
@@ -431,6 +433,8 @@ extension Game {
     
     // MARK: G - STAT
     func statStep() {
+        
+        // NOMBRE TOUR / alive ? => Barre
         
         player.main.finalScore = _statStep_AverageScore(OfPlayer: player.main)
         player.second.finalScore = _statStep_AverageScore(OfPlayer: player.second)
