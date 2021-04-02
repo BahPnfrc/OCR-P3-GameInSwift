@@ -239,26 +239,46 @@ extension Game {
             // A - Pick one player
             switchPlayers() // Attacker and defender are switched
             Console.write(0, 0, "🔔 *Ding Ding* : Round \(round) of \(attackingPlayer.name), Fight 🥊 !".withNum(), 0)
-            // B - Lists all toons
-            let listHeader: String = "Ok \(attackingPlayer.name), pick one of your champions :"
-            _ = attackingPlayer.listAllToons(aliveOnly: false, header: listHeader)
-            // C - Choose one toon
-            let choosenToon: Toon = _fightStep_chooseToon(of: attackingPlayer)
-            // D - Engage in action
-            var didMedicine: Bool = false
-            if let medicalToon = choosenToon as? Medical { didMedicine = _fightStep_isDoctor(withToon: medicalToon)
-            } else { _fightStep_isElse(withToon: choosenToon) }
-            // E - Report
-            if didMedicine {
-                let reportHeader = "Here is \(attackingPlayer.name)'s Team after medication ⛑ :"
-                _ = attackingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
+            
+            if let machine = attackingPlayer as? Machine {
+                
+                let action = machine.play(inGame: self)
+                if let doAttack = action.attackCase {
+                    
+                    _fightStep_machineFight(withToon: doAttack.attacker, againt: doAttack.defender)
+                    
+                } else {
+                    
+                    guard let doMedicine = action.medicineCase else { return }
+                    let doctor: Medical = machine.toons.first(where: { $0.self is Medical }) as! Medical
+                    let medicine = doMedicine.useMedicine ; let toon = doMedicine.onToon
+                    _fightStep_machineApplyMedicine(doctor: doctor, medicine: medicine, onToon: toon)
+                
+                }
+                
             } else {
-                let reportHeader = "Here is \(defendingPlayer.name)'s Team after this blow 🪖 :"
-                _ = defendingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
+                // B - Lists all toons
+                let listHeader: String = "Ok \(attackingPlayer.name), pick one of your champions :"
+                _ = attackingPlayer.listAllToons(aliveOnly: false, header: listHeader)
+                // C - Choose one toon
+                let choosenToon: Toon = _fightStep_chooseToon(of: attackingPlayer)
+                // D - Engage in action
+                var didMedicine: Bool = false
+                if let medicalToon = choosenToon as? Medical { didMedicine = _fightStep_isDoctor(withToon: medicalToon)
+                } else { _fightStep_isElse(withToon: choosenToon) }
+                // E - Report
+                if didMedicine {
+                    let reportHeader = "Here is \(attackingPlayer.name)'s Team after medication ⛑ :"
+                    _ = attackingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
+                } else {
+                    let reportHeader = "Here is \(defendingPlayer.name)'s Team after this blow 🪖 :"
+                    _ = defendingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
+                }
+                // F - Prompt to continue
+                let exitPrompt: Bool =  Console.getExitPrompt(exitWord: "exit")
+                if exitPrompt == true { break }
             }
-            // F - Prompt to continue
-            let exitPrompt: Bool =  Console.getExitPrompt(exitWord: "exit")
-            if exitPrompt == true { break }
+            
         } while _fightStep_CanContinue()
         
     }
@@ -356,6 +376,7 @@ extension Game {
         _fightStep_applyDamageAndStats(from: attacker, to: defender, of: Int(damage))
         _figthStep_Report(from: attacker, to: defender, of: Double(damage))
     }
+    
     private func _fightStep_applyDamageAndStats(from attacker: Toon, to defender: Toon, of damage: Int) {
         // A - Attacker
         attacker.statSet.roundPlayed += 1
@@ -388,6 +409,24 @@ extension Game {
         if defendingPlayer.toons.allSatisfy({ $0.lifeSet.hitpoints <= 0 }) {
             return false // stop
         } else { return true } // Stop
+    }
+    
+    // MARK: F - C - Machine
+    private func _fightStep_machineFight(withToon attacker: Toon, againt defender: Toon) {
+        let damage: Double = Weapon.getDamage(from: attacker, to: defender)
+        _fightStep_applyDamageAndStats(from: attacker, to: defender, of: Int(damage))
+        _figthStep_Report(from: attacker, to: defender, of: Double(damage))
+    }
+    
+    private func _fightStep_machineApplyMedicine(doctor: Medical, medicine: Medicine, onToon toon: Toon?) {
+        var restoredHitpoints: Int // #STAT
+        if let teamUseMedicine = medicine as? TeamUseMedicine {
+            restoredHitpoints = teamUseMedicine.use(OnTeam: attackingPlayer) // #STAT
+        } else {
+            let singleUseMedicine = medicine as! SingleUseMedicine
+            restoredHitpoints = singleUseMedicine.use(onToon: toon!) // #STAT
+        }
+        doctor.statSet.medicine.given += restoredHitpoints // #STAT
     }
     
     // MARK: G - STAT

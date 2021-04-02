@@ -44,7 +44,12 @@ final class Machine: Player {
         return results
     }
     
-    private func chooseTarget(inGame game: Game) -> (DmgCase){
+    private func _aliveOnly(_ toons: [Toon]) -> [Toon] {
+        return toons.filter({ $0.isAlive() })
+    }
+    
+    func play (inGame game: Game)
+    -> (attackCase: DmgCase?, medicineCase: (useMedicine: Medicine, onToon: Toon)?){
         let machine: Player = game.attackingPlayer as! Machine
         let human: Player = game.defendingPlayer
         
@@ -67,73 +72,60 @@ final class Machine: Player {
             defenseCasesOnN1.sort { $0.damage > $1.damage }
             attackCasesOnN0.shuffle() ; defenseCasesOnN1.shuffle()
         }
+            
+        let canTakeToonOrBestCase = _canTakeToonOrBestCase(attackCases: attackCasesOnN0)
+        let canLoseToonOrWorstCase = _canLoseToonOrWorstCase(defenseCases: defenseCasesOnN1)
+        let shouldAttackDoctor = _shouldAttackDoctor(attackCases: attackCasesOnN0)
         
+        switch canLoseToonOrWorstCase.result {
+        case false: // A1 - Machine can't lose toon on N1
             
-        let canTake_orBestCase = _check_1_canTake_OrBestCase(attackCases: attackCasesOnN0)
-        let canLose_orWorstCase = _check_2_canLose_orWorstCase(defenseCases: defenseCasesOnN1)
-        let shouldAttackDoctor = _check_5_shouldAttackDoctor(attackCases: attackCasesOnN0)
+            if canTakeToonOrBestCase.result == true { return (canTakeToonOrBestCase.playPattern, nil) } // 1° : Take out any
+            else if shouldAttackDoctor.result == true { return (shouldAttackDoctor.playPattern!, nil) } // 2° : Take out Doctor primarily
+            else { return (canTakeToonOrBestCase.playPattern, nil) } // 3° : Play best case
         
-        switch canLose_orWorstCase.result {
-        case false: // A - Machine can't lose toon on N1
+        case true: // A2 - Machine can lose toon on N1
             
-            if canTake_orBestCase.result == true { return canTake_orBestCase.playPattern } // 1° : Take out any
-            else if shouldAttackDoctor.result == true { return shouldAttackDoctor.playPattern! } // 2° : Take out Doctor second
-            else { return canTake_orBestCase.playPattern } // 3° : Do best case third
-        
-        case true: // B - Machine can lose toon on N1
-            
-            let threatIsBestTarget = _check_3_threatIsBestTarget(
-                attackCases: attackCasesOnN0,
-                defenseCases: defenseCasesOnN1)
-            
-            switch threatIsBestTarget.result {
-            case true:
+                let canTakeOutNextRoundThreat = _canTakeOutNextRoundThreat(
+                        attackCases: attackCasesOnN0,
+                        defenseCases: defenseCasesOnN1)
                 
-                return threatIsBestTarget.playPattern! // 4° : Kill threat
+                switch canTakeOutNextRoundThreat.result {
+                case true: // B1 - Machine can take out threat
+                    
+                    return (canTakeOutNextRoundThreat.playPattern!, nil) // 4° : Take out threat
             
-            case false:
+            case false: // B2 - Machine can't take out threat
                 
-                let check_4 = _check_4_outnumberOrEqual(machine: game.attackingPlayer, human: game.defendingPlayer)
-                if check_4 == true {
-                    let check_5 = _check_5_shouldAttackDoctor(attackCases: attackCasesOnN0)
-                    if check_5.result == true { return check_5.playPattern! } // Attack the doctor with highest damage
+                let asManyOrMoreToonsLeft = _asManyOrMoreToonsLeft(machine: game.attackingPlayer, human: game.defendingPlayer)
+                
+                switch asManyOrMoreToonsLeft {
+                case true: // C1 - Machine outnumber or equals Human
+                    if shouldAttackDoctor.result == true { return (shouldAttackDoctor.playPattern!, nil) } // 5° : Take out Doctor primarily
+                    else { return (canTakeToonOrBestCase.playPattern, nil) } // 6° : Play best case
                     
-                } else {
+                case false: // C2 - Human outnumbers or equals Machine
                     
+                    let shoudlUseMedicine = _shouldUseMedicine(machine: game.attackingPlayer)
+                    switch shoudlUseMedicine.result {
+                    case true: // D1 : Team suffers injuries
+                        
+                        // 7° : Use medicine if necessary
+                        guard let returnedMedicine = shoudlUseMedicine.withMedicine,
+                              let returnedToon = shoudlUseMedicine.onToon
+                        else { fallthrough }
+                        return (nil, (returnedMedicine, returnedToon))
+                        
+                    case false: // D2 Team suffers not injuries
+                        return (canTakeToonOrBestCase.playPattern, nil)// 6° : Play best case
+                    }
+                   
                 }
-            
             }
         }
-    
-        
-            
-        
+    }
 
-            
-        
-     
-    }
-    
-    private func _getHardCase() {
-        
-    }
-    private func _getEasyCase() {
-        
-    }
-    private func _getElseCase() {
-        
-    }
-    
-    private func _aliveOnly(_ toons: [Toon]) -> [Toon] {
-        return toons.filter({ $0.isAlive() })
-    }
-    
-    private func _chooseCaseOnIndexZero(attackCases: [DmgCase]) {
-        
-        
-    }
-    
-    private func _check_1_canTake_OrBestCase(attackCases: [DmgCase])
+    private func _canTakeToonOrBestCase(attackCases: [DmgCase])
     -> (result: Bool, playPattern: DmgCase) {
         guard let canKillCase = attackCases.first(where: {$0.isLethal == true}) else {
             let elseCase = attackCases.first(where: {$0.isLethal == false})!
@@ -142,22 +134,22 @@ final class Machine: Player {
         return (true, canKillCase)
     }
     // If true assign target ; Else do :
-    private func _check_2_canLose_orWorstCase(defenseCases: [DmgCase])
+    private func _canLoseToonOrWorstCase(defenseCases: [DmgCase])
     -> (result: Bool, playPattern: DmgCase) {
         guard let canBeKilledCase = defenseCases.first(where: {$0.isLethal == true}) else {
-            let elseCase = defenseCases.first(where: {$0.isLethal == false})!
+            let elseCase = defenseCases.first(where: { $0.isLethal == false} )!
             return (false, elseCase)
         }
         return (true, canBeKilledCase)
     }
     // If true assign target ; Else do :
-    private func _check_3_threatIsBestTarget(attackCases: [DmgCase], defenseCases: [DmgCase])
+    private func _canTakeOutNextRoundThreat(attackCases: [DmgCase], defenseCases: [DmgCase])
     -> (result: Bool, playPattern: DmgCase?) {
         for defenseCase in defenseCases {
             if defenseCase.isLethal {
                 for attackCase in attackCases {
                     if attackCase.isLethal && attackCase.defender.ID == defenseCase.attacker.ID {
-                        return (true, attackCase) // The N+1 lethal attacker can be killed at N
+                        return (true, attackCase) // Take out on N0 the threat of N1
                     }
                 }
             }
@@ -165,7 +157,7 @@ final class Machine: Player {
         return (false, nil)
     }
     // If true assign target ; Else do :
-    private func _check_4_outnumberOrEqual(machine: Player, human: Player) -> Bool {
+    private func _asManyOrMoreToonsLeft(machine: Player, human: Player) -> Bool {
         var attackerLeftToons: Int = 0
         var defenderLeftToons: Int = 0
         for toon in machine.toons { if toon.isAlive() { attackerLeftToons += 1 }}
@@ -173,7 +165,7 @@ final class Machine: Player {
         return attackerLeftToons >= defenderLeftToons ? true : false
     }
     // If true assign target ; Else do :
-    private func _check_5_shouldAttackDoctor(attackCases: [DmgCase])
+    private func _shouldAttackDoctor(attackCases: [DmgCase])
     -> (result: Bool, playPattern: DmgCase?) {
         // A - Pick only cases where defender is Medical
         var attackOnDoctor = attackCases.filter({ $0.defender is Medical})
@@ -188,14 +180,39 @@ final class Machine: Player {
         return (false, nil)
     }
     
-    private func _check_5b_shouldUseMedicine() {
+    private func _shouldUseMedicine(machine: Player)
+    -> (result: Bool, withMedicine: Medicine?, onToon: Toon?){
+        // A - See if doctor and medicines are left
+        guard let isDoctor = machine.toons.first(where: { $0.self is Medical }) else { return (false, nil, nil) }
+        let doctor: Medical = isDoctor as! Medical ; guard doctor.isAlive() else { return (false, nil, nil) }
+        guard !doctor.medicalPack.allSatisfy({ $0.left == 0 }) else { return (false, nil, nil) }
+        // B - Get all medicine use cases in array
+        var medicineCases: [(toon: Toon, medicine: Medicine, gain: Int)] = []
+        for medicine in doctor.medicalPack { // For each medicine
+            guard medicine.left > 0 else { continue }
+            let restoreTo: Double = Double(Setting.Toon.defaultLifeSet.hitpoints) * medicine.factor
+            for toon in machine.toons { // On each toon
+                guard toon.isAlive() else { continue }
+                let gain: Int = Int(restoreTo) - toon.getPercentLeft()
+                if gain > 0 { medicineCases.append((toon, medicine, gain)) } // Save case
+            }
+        }
+        guard medicineCases.count > 0 else { return (false, nil, nil) }
+        let heavyMedicineNeed = medicineCases.filter({ $0.medicine.type == .isHeavy})
+        var lightMedicineNeed = medicineCases.filter({ $0.medicine.type == .isLight })
+        var mediumMedicineNeed = medicineCases.filter({ $0.medicine.type == .isMedium })
         
-    }
-    
-    // If true assign target ; Else do :
-    private func _check_6_shouldUseMedicine() -> (Bool) {
-        
-        
-        return false
+        if heavyMedicineNeed.count > 1 && heavyMedicineNeed.allSatisfy( {$0.gain > 100 } ) {
+            // C1 - Heavy medicine use if 2 toons at least are under 50%
+            return (true, heavyMedicineNeed[0].medicine, nil)
+        } else if lightMedicineNeed.count > 0 {
+            // C2 - Light medicine use if 1 toon is under 70%
+            lightMedicineNeed.sort { $0.gain > $1.gain }
+            return (true, lightMedicineNeed[0].medicine, lightMedicineNeed[0].toon)
+        } else {
+            // C3 - Medium medicine use if 1 toon is under 90%
+            mediumMedicineNeed.sort { $0.gain > $1.gain }
+            return (true, mediumMedicineNeed[0].medicine, mediumMedicineNeed[0].toon)
+        }
     }
 }

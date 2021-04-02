@@ -11,7 +11,7 @@ final class SingleUseMedicine: Medicine {
     
     func use(onToon toon: Toon) -> Int {
         let expectedHitpoints: Double = Double(Setting.Toon.defaultLifeSet.hitpoints) * self.factor
-        let restored = restoreHitpointsAndStats(ofToon: toon, to: Int(expectedHitpoints))
+        let restored = restoreHitpointsWithStats(ofToon: toon, to: Int(expectedHitpoints))
         if restored > 0 {
             Console.write(1, 1, """
                 ℹ️\(toon.getPicWithName()) just had a \(self.getPicWithName()) :
@@ -23,7 +23,7 @@ final class SingleUseMedicine: Medicine {
                     """, 1)
         }
         self.left -= 1
-        return restored // #STAT
+        return restored 
     }
     
 }
