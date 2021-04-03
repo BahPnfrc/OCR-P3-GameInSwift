@@ -12,7 +12,11 @@ class TeamUseMedicine: Medicine {
     func use(OnTeam player: Player) -> Int {
         var restored: Int = 0
         let expectedHitpoints: Double = Double(Setting.Toon.defaultLifeSet.hitpoints) * self.factor
-        for toon in player.toons { restored += restoreHitpointsWithStats(ofToon: toon, to: Int(expectedHitpoints))}
+        for toon in player.toons {
+            if toon.isAlive() {
+                restored += restoreHitpointsWithStats(ofToon: toon, to: Int(expectedHitpoints))
+            }
+        }
         Console.write(1, 1, """
             Team of \(player.name) experienced the \(self.getPicWithName()) :
             They gained a total of \(restored) hitpoints 💪

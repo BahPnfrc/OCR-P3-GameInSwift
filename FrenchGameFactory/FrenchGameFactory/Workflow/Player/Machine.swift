@@ -45,11 +45,11 @@ final class Machine: Player {
     }
     
     private func _aliveOnly(_ toons: [Toon]) -> [Toon] {
-        return toons.filter({ $0.isAlive() })
+        return toons.filter({ $0.isAlive() == true })
     }
     
     func play (inGame game: Game)
-    -> (attackCase: DmgCase?, medicineCase: (useMedicine: Medicine, onToon: Toon)?){
+    -> (attackCase: DmgCase?, medicineCase: (useMedicine: Medicine, onToon: Toon?)?){
         let machine: Player = game.attackingPlayer as! Machine
         let human: Player = game.defendingPlayer
         
@@ -62,8 +62,8 @@ final class Machine: Player {
         
         switch game.level {
         case .isHard:
-            attackCasesOnN0.sort { $0.isLethal && $0.damage > $1.damage } // Damages computer can give
-            defenseCasesOnN1.sort { $0.isLethal && $0.damage > $1.damage } // Damages computer can receive
+            attackCasesOnN0.sort { $0.damage > $1.damage } // Damages computer can give
+            defenseCasesOnN1.sort { $0.damage > $1.damage } // Damages computer can receive
         case .isEasy:
             attackCasesOnN0.sort { !$0.isLethal && $0.damage < $1.damage }
             defenseCasesOnN1.sort { !$0.isLethal && $0.damage < $1.damage }
@@ -95,30 +95,35 @@ final class Machine: Player {
                     
                     return (canTakeOutNextRoundThreat.playPattern!, nil) // 4° : Take out threat
             
-            case false: // B2 - Machine can't take out threat
+                case false: // B2 - Machine can't take out threat
                 
-                let asManyOrMoreToonsLeft = _asManyOrMoreToonsLeft(machine: game.attackingPlayer, human: game.defendingPlayer)
-                
-                switch asManyOrMoreToonsLeft {
-                case true: // C1 - Machine outnumber or equals Human
-                    if shouldAttackDoctor.result == true { return (shouldAttackDoctor.playPattern!, nil) } // 5° : Take out Doctor primarily
-                    else { return (canTakeToonOrBestCase.playPattern, nil) } // 6° : Play best case
+                    let asManyOrMoreToonsLeft = _asManyOrMoreToonsLeft(machine: game.attackingPlayer, human: game.defendingPlayer)
                     
-                case false: // C2 - Human outnumbers or equals Machine
-                    
-                    let shoudlUseMedicine = _shouldUseMedicine(machine: game.attackingPlayer)
-                    switch shoudlUseMedicine.result {
-                    case true: // D1 : Team suffers injuries
+                    switch asManyOrMoreToonsLeft {
+                    case true: // C1 - Machine outnumber or equals Human
                         
-                        // 7° : Use medicine if necessary
-                        guard let returnedMedicine = shoudlUseMedicine.withMedicine,
-                              let returnedToon = shoudlUseMedicine.onToon
-                        else { fallthrough }
-                        return (nil, (returnedMedicine, returnedToon))
+                        if shouldAttackDoctor.result == true { return (shouldAttackDoctor.playPattern!, nil) } // 5° : Take out Doctor primarily
+                        else { return (canTakeToonOrBestCase.playPattern, nil) } // 6° : Play best case
                         
-                    case false: // D2 Team suffers not injuries
-                        return (canTakeToonOrBestCase.playPattern, nil)// 6° : Play best case
-                    }
+                    case false: // C2 - Human outnumbers or equals Machine
+                        
+                        let shoudlUseMedicine = _shouldUseMedicine(machine: game.attackingPlayer)
+                        switch shoudlUseMedicine.result {
+                        case true: // D1 : Team suffers injuries
+                            
+                            // 7° : Use medicine if necessary
+                            guard let returnedMedicine = shoudlUseMedicine.withMedicine else { fallthrough }
+                            if returnedMedicine.type == .isHeavy { return (nil, (returnedMedicine, nil))
+                            } else {
+                                guard let returnedToon = shoudlUseMedicine.onToon else { fallthrough }
+                                return (nil, (returnedMedicine, returnedToon))
+                            }
+                            
+                            
+                        case false: // D2 Team suffers not injuries
+                            // 8° : Play best case
+                            return (canTakeToonOrBestCase.playPattern, nil)
+                        }
                    
                 }
             }
@@ -193,7 +198,7 @@ final class Machine: Player {
             let restoreTo: Double = Double(Setting.Toon.defaultLifeSet.hitpoints) * medicine.factor
             for toon in machine.toons { // On each toon
                 guard toon.isAlive() else { continue }
-                let gain: Int = Int(restoreTo) - toon.getPercentLeft()
+                let gain: Int = Int(restoreTo) - toon.lifeSet.hitpoints
                 if gain > 0 { medicineCases.append((toon, medicine, gain)) } // Save case
             }
         }
