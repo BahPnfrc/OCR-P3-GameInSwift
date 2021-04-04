@@ -183,8 +183,29 @@ class Toon: LifeSet, SkillSet, FightSet, StatSet {
         }
     }
 }
+// MARK: Extension : Random Name
+extension Toon {
+   
+    private static var defaultNameForMan: [String] =
+        ["Zenon", "Danton", "Gatien", "Zephir", "Clodomir",
+        "Petrus", "Lazare", "Flavien", "Ovide", "Medard"]
+    
+    private static var defaultnameForWoman: [String] =
+        ["Evodie", "Rejane", "Vitaline", "Nonce", "Toussine",
+         "Firmine", "Peroline", "Gratienne", "Renelle", "Zilda"]
+    
+    func getRandomName() -> String {
+        var randomName: String
+        var rightArray = self.gender == .isMan ?
+            Toon.defaultNameForMan : Toon.defaultnameForWoman
+        rightArray.shuffle()
+        randomName = rightArray.first!
+        rightArray.removeFirst()
+        return randomName
+    }
+}
 // MARK: Extension : Retrieve data
-extension Toon { //
+extension Toon {
     
     static func resetAllPromptID() {
         for toon in Engineer.All { toon.promptID = 0 }
@@ -218,7 +239,9 @@ extension Toon { //
         return name + " : " + age + " " + tool
     }
     func getFightPrompt() -> String {
-        let name : String = String(promptID) + ". " + getPicWithName()
+        let name : String = self.isAlive() ?
+        String(promptID) + ". " + getPicWithName() :
+        String(promptID) + ". ❌" + getPicWithName()
         let tool : String = weapon!.getPicWithName()
         return name + " with " + getHisOrHer() + tool
     }
@@ -237,14 +260,15 @@ extension Toon { //
         let percentAsString = " " + String(percentLeft) + "%"
         // B - Percent as a picture
         let barLenght: Int = blocks
-        let visualModel: [(Percent: Int, Block: String)] =
+        let model: [(percent: Int, block: String)] =
         [(60, "🟩"), (40, "🟨"), (20, "🟧"),(0, "🟥")]
         var lifeBar: String = ""
-        for step in visualModel {
-            if  percentLeft >= step.Percent {
-                let coloredBlockNumber: Int = percentLeft * barLenght / 100
+        for step in model {
+            if percentLeft > step.percent {
+                var coloredBlockNumber: Int = percentLeft * barLenght / 100
+                if coloredBlockNumber == 0 { coloredBlockNumber = 1 } //
                 let blanckBlockNumber: Int = barLenght - coloredBlockNumber
-                lifeBar.append(String(repeating: step.Block, count: coloredBlockNumber))
+                lifeBar.append(String(repeating: step.block, count: coloredBlockNumber))
                 lifeBar.append(String(repeating: "⬜️", count: blanckBlockNumber))
                 return lifeBar + percentAsString
             }
@@ -252,36 +276,4 @@ extension Toon { //
         lifeBar.append(String(repeating: "⬜️", count: barLenght))
         return lifeBar + percentAsString
     }
-    
-}
-
-// MARK: Extension : Random Name
-extension Toon {
-   
-    private static var defaultNameForMan: [String] =
-        ["Zenon", "Danton", "Gatien", "Zephir", "Clodomir",
-        "Petrus", "Lazare", "Flavien", "Ovide", "Medard"]
-    
-    private static var defaultnameForWoman: [String] =
-        ["Evodie", "Rejane", "Vitaline", "Nonce", "Toussine",
-         "Firmine", "Peroline", "Gratienne", "Renelle", "Zilda"]
-    
-    func getRandomName() -> String {
-        var randomName: String
-        var rightArray = self.gender == .isMan ?
-            Toon.defaultNameForMan : Toon.defaultnameForWoman
-        rightArray.shuffle()
-        randomName = rightArray.first!
-        rightArray.removeFirst()
-        return randomName
-    }
-    
-}
-// MARK: Extension : Not used any
-extension Toon {
-    
-    static func getRandomPic(_ pics: String) -> String {
-       return pics.components(separatedBy: ",").randomElement()!
-   }
-    
 }

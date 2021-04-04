@@ -48,7 +48,12 @@ class Game {
     
     init(){
         // MARK: A - MODE
-        Console.write(0, 0, "WELCOME TO THE GAME")
+        Console.write(0, 0, """
+            ➡️🅿️ierre-🅰️lexandre 🅱️AH
+            ✅🅾️penClassRooms - Projet #️⃣2️⃣
+            
+            ✨🕹✨ WELCOME TO THE GAME ✨🕹✨
+            """)
         Console.write(1, 1, """
             How do you want to play ?
             1. 🧠 Against a friend
@@ -84,7 +89,7 @@ class Game {
                 How do you want me to be ?
                 1. 🌸 Easy. Because you're soft and delicate
                 2. 🏓 Medium. For a real one on one baby
-                3. 🪖 Hard. Can't fight the dust !
+                3. 🪖 Hard. I'll unleash my full potential
                 """.withNum(), 1)
             let levelPrompt: Int =
                 !isRunningTest ? Console.getIntInput(fromTo: 1...3) : 3 // #TEST
@@ -238,12 +243,12 @@ extension Game {
             Console.newSection()
             // A - Pick one player
             switchPlayers() // Attacker and defender are switched
-            Console.write(0, 0, "🔔 *Ding Ding* : Round \(round) of \(attackingPlayer.name), Fight 🥊 !".withNum(), 0)
+            Console.write(0, 0, "➡️ Round #️⃣\(round) : 🔔 *Ding Ding* \(attackingPlayer.name) on stage, Fight 🥊 !".withNum(), 1)
             
             var didMedicine: Bool = false
             if let machine = attackingPlayer as? Machine { // Machine autoplay
                 
-                didMedicine =  _fightStep_machineAutoplay(withMachine: machine)
+                didMedicine =  _fightStep_machinePlayWithIA(withMachine: machine)
                 
             } else { // Human play
                 
@@ -258,6 +263,7 @@ extension Game {
             }
             
             // E - Report
+            
             if didMedicine {
                 let reportHeader = "Here is \(attackingPlayer.name)'s Team after medication ⛑ :"
                 _ = attackingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
@@ -278,7 +284,7 @@ extension Game {
             let promptForNumber = Console.getIntInput(fromTo: 1...player.toons.count)
             let choosenToon = player.toons.first(where: { $0.promptID == promptForNumber })!
             if !choosenToon.isAlive() {
-                Console.write(1, 1, choosenToon.getPicWithName() + " can't fight : \(choosenToon.getHeOrShe())is knocked out 🥊", 1)
+                Console.write(1, 1, "❌" + choosenToon.getPicWithName() + " can't fight : \(choosenToon.getHeOrShe()) is knocked out 🥊", 1)
             } else { return choosenToon }
         }
     }
@@ -401,12 +407,12 @@ extension Game {
         } else { return true } // Stop
     }
     
-    // MARK: F - C - Machine
-    private func _fightStep_machineAutoplay(withMachine machine: Machine) -> Bool {
+    // MARK: F - c - Machine
+    private func _fightStep_machinePlayWithIA(withMachine machine: Machine) -> Bool {
         var didMedicine: Bool = false
-        let action = machine.play(inGame: self)
+        let action = machine.PlayWithIA(game: self)
         if let doAttack = action.attackCase {
-            Console.write(1, 1, "⚙️ \(attackingPlayer.name) made a choice and decided to attack :", 0)
+            Console.write(0, 1, "⚙️ \(attackingPlayer.name) made a choice and decided to attack :", 0)
             _fightStep_machineFight(withToon: doAttack.attacker, againt: doAttack.defender)
             return didMedicine
         } else {
@@ -414,7 +420,7 @@ extension Game {
                 Console.write(1, 1, "❌ An error occured and the game will quit now !", 0)
                 return didMedicine
             }
-            Console.write(1, 1, "⚙️ \(attackingPlayer.name) made a choice and decided to use medicine :", 1)
+            Console.write(0, 1, "⚙️ \(attackingPlayer.name) made a choice and decided to use medicine :", 0)
             let doctor: Medical = machine.toons.first(where: { $0.self is Medical }) as! Medical
             let medicine = doMedicine.useMedicine ; let toon = doMedicine.onToon
             _fightStep_machineApplyMedicine(doctor: doctor, medicine: medicine, onToon: toon)
@@ -466,13 +472,13 @@ extension Game {
         var mostMedicineGivenRank: String = ""
         for index in 0...2 {
             mostDamageGivenRank += Medals[index] + " - " + mostDamageGiven[index].getPicWithName() + " : "
-                + String(mostDamageGiven[index].statSet.totalDamage.given) + " hitpoints taken\n"
+                + String(mostDamageGiven[index].statSet.totalDamage.given) + " hitpoints given\n"
             bestDamageGivenRank += Medals[index] + " - " + bestDamageGiven[index].getPicWithName() + " : "
-                + String(bestDamageGiven[index].statSet.bestDamage.given) + " hitpoints taken\n"
+                + String(bestDamageGiven[index].statSet.bestDamage.given) + " hitpoints given\n"
         }
         for index in 0...1 {
             mostMedicineGivenRank += Medals[index] + " - " + mostMedicineGiven[index].getPicWithName() + " : "
-                + String(mostMedicineGiven[index].statSet.medicine.given) + " hitpoints saved\n"
+                + String(mostMedicineGiven[index].statSet.medicine.given) + " hitpoints given\n"
         }
         
         let rank:String = """

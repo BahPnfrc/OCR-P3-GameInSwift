@@ -28,7 +28,7 @@ class Player {
     func listAllToons(aliveOnly: Bool, header: String? = nil, withBar: Bool = true) -> ClosedRange<Int> {
         // Header
         let header: String = header ?? "Team of \(self.name) :"
-        Console.write(1, 1, header,0)
+        Console.write(0, 1, header,0)
         // Body
         var body:String = ""
         var currentPromptID = 0
