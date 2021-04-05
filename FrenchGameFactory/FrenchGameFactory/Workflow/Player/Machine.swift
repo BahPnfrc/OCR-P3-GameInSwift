@@ -257,7 +257,7 @@ final class Machine: Player {
             // C3 - Light medicine use if 1 toon is under 70%
             toonsUnderPercent70.sort { $0.gain > $1.gain }
             return (true, toonsUnderPercent70[0].medicine, toonsUnderPercent70[0].toon)
-        } else { // C4 - Heavy medicine use if 1 toon is under 50
+        } else {
             return (true, toonsUnderPercent50[0].medicine, nil)
         }
     }

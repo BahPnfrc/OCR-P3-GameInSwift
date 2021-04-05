@@ -7,18 +7,12 @@
 
 import Foundation
 
-
 class toto{
     
-    // Patron de conception , design pattern
-    // dangereux en multithread car "restreint l'instanciation d'une classe à un seul objet"
-    
-    //let toto = "bonjour"
-    //let tata = toto
-    
-    // array string dict = value type  par coeur
-    
-    // déballer sert à débuguer (optionnel)
+    // I. Déf. d'un Singleton : Patron de conception , design pattern
+    // II. Danger d'un Singleton : Dangereux en multithread car "restreint l'instanciation d'une classe à un seul objet"
+    // III. Value/Référence : SAD (string, array, dict) => Value type !
+    // IV. Plan pratique, à quoi sert de déballer : déballer sert à débuguer (optionnel)
     
     static let shared = toto()
     func tata() {

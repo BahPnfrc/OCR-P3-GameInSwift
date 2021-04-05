@@ -18,9 +18,12 @@ class Setting {
     class Weapon {
         
         static let basicDamage: Double = 100
-        static let updatedDamage: Double = 150
+        static let updatedDamage: Double = 110
         static let expectedBasicDamage: Double = basicDamage * 3
         static let expectedUpdatedDamage: Double = updatedDamage * 3
+        
+        static let extraWeaponBiologicBonus: Double = 150
+        static let extraWeaponBiologicMalus: Double = 50
         
         static let kineticGenderExtraModifier:
             (forMan: Double, forWoman: Double)

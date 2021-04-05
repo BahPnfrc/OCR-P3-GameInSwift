@@ -48,12 +48,7 @@ class Game {
     
     init(){
         // MARK: A - MODE
-        Console.write(0, 0, """
-            ➡️🅿️ierre-🅰️lexandre 🅱️AH
-            ✅🅾️penClassRooms - Projet #️⃣2️⃣
-            
-            ✨🕹✨ WELCOME TO THE GAME ✨🕹✨
-            """)
+        Console.write(0, 0, "✨🕹✨ WELCOME TO THE GAME ✨🕹✨")
         Console.write(1, 1, """
             How do you want to play ?
             1. 🧠 Against a friend
@@ -237,13 +232,15 @@ extension Game {
         Toon.resetAllPromptID()
         var counter: Int = 0
         var round: Int = 0
+        var turn: [String] = ["🅰️","🅱️"]
         repeat {
             counter += 1
             if (counter - 1).isMultiple(of: 2) {round += 1}
             Console.newSection()
             // A - Pick one player
             switchPlayers() // Attacker and defender are switched
-            Console.write(0, 0, "➡️ Round #️⃣\(round) : 🔔 *Ding Ding* \(attackingPlayer.name) on stage, Fight 🥊 !".withNum(), 1)
+            Console.write(0, 0, "➡️ Round #️⃣\(round)\(turn[0]) : 🔔 *Ding Ding* \(attackingPlayer.name) on stage, Fight 🥊 !".withNum(), 1)
+            turn.swapAt(0, 1)
             
             var didMedicine: Bool = false
             if let machine = attackingPlayer as? Machine { // Machine autoplay
@@ -284,7 +281,7 @@ extension Game {
             let promptForNumber = Console.getIntInput(fromTo: 1...player.toons.count)
             let choosenToon = player.toons.first(where: { $0.promptID == promptForNumber })!
             if !choosenToon.isAlive() {
-                Console.write(1, 1, "❌" + choosenToon.getPicWithName() + " can't fight : \(choosenToon.getHeOrShe()) is knocked out 🥊", 1)
+                Console.write(1, 1, choosenToon.getPicWithName() + " can't fight : \(choosenToon.getHeOrShe())is knocked out !", 1)
             } else { return choosenToon }
         }
     }
@@ -472,19 +469,19 @@ extension Game {
         var mostMedicineGivenRank: String = ""
         for index in 0...2 {
             mostDamageGivenRank += Medals[index] + " - " + mostDamageGiven[index].getPicWithName() + " : "
-                + String(mostDamageGiven[index].statSet.totalDamage.given) + " hitpoints given\n"
+                + String(mostDamageGiven[index].statSet.totalDamage.given) + " hitpoints taken\n"
             bestDamageGivenRank += Medals[index] + " - " + bestDamageGiven[index].getPicWithName() + " : "
-                + String(bestDamageGiven[index].statSet.bestDamage.given) + " hitpoints given\n"
+                + String(bestDamageGiven[index].statSet.bestDamage.given) + " hitpoints taken\n"
         }
         for index in 0...1 {
             mostMedicineGivenRank += Medals[index] + " - " + mostMedicineGiven[index].getPicWithName() + " : "
-                + String(mostMedicineGiven[index].statSet.medicine.given) + " hitpoints given\n"
+                + String(mostMedicineGiven[index].statSet.medicine.given) + " hitpoints taken\n"
         }
         
         let rank:String = """
             They made History today 🏆 :
-            🏁 - \(result.winner.name) : \(result.winner.finalScore) damages given
-            🏳️ - \(result.loser.name) : \(result.loser.finalScore) damages given
+            🏁 - \(result.winner.name) : \(result.winner.finalScore) damages taken
+            🏳️ - \(result.loser.name) : \(result.loser.finalScore) damages taken
 
             Best unique damage dealer 🎯 :
             \(bestDamageGivenRank)

@@ -81,7 +81,7 @@ enum Gender: String, CaseIterable {
     case isMan = "man", isWoman = "woman"
 }
 enum Age: String, CaseIterable {
-    case isJunior = "30'", isAdult = "40'", isSenior = "50'"
+    case isJunior = "mid 30'", isAdult = "mid 40'", isSenior = "mid 50'"
 }
 
 // MARK: Class
@@ -215,7 +215,7 @@ extension Toon {
     
     func getHeOrShe(withMaj:Bool = false) -> String {
         gender == .isMan ?
-            (withMaj == true ? "He " : "he") :
+            (withMaj == true ? "He " : "he ") :
             (withMaj == true ? "She " : "she ")
     }
     func getHisOrHer(withMaj:Bool = false) -> String {
@@ -227,6 +227,8 @@ extension Toon {
         age.rawValue + " " + gender.rawValue
     }
     func getPicWithName() -> String {
+        var pic = self.pic
+        if !isAlive() { pic = "❌" + pic}
         guard let name = name else {
             return  pic + " " + title
         }
@@ -239,9 +241,7 @@ extension Toon {
         return name + " : " + age + " " + tool
     }
     func getFightPrompt() -> String {
-        let name : String = self.isAlive() ?
-        String(promptID) + ". " + getPicWithName() :
-        String(promptID) + ". ❌" + getPicWithName()
+        let name : String = String(promptID) + ". " + getPicWithName()
         let tool : String = weapon!.getPicWithName()
         return name + " with " + getHisOrHer() + tool
     }

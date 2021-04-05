@@ -57,7 +57,7 @@ final class Medical: Toon {
                 case (.isSenior, .isMan):
                     toon = ("👨‍🔬", "Nobel Price") ; weapon = ("🧪", "Secret Substance")
                 case (.isSenior, .isWoman):
-                    toon = ("👩‍🔬", "Nobel Price") ; weapon = ("🦠", "Vicious Virus")
+                    toon = ("👩‍🔬", "Nobel Price") ; weapon = ("🧫", "Petri Plague")
             }
             let newMedical: Medical = Medical(
                 withGender: gender,
