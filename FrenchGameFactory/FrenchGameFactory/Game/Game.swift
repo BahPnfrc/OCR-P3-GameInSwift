@@ -7,28 +7,6 @@
 
 import Foundation
 
-extension String {
-    func withNum() -> String {
-        var result: String = self
-        let changeSet: [(from: String, to: String)] =
-            [("0", "0️⃣"), ("1", "1️⃣"), ("2", "2️⃣"), ("3", "3️⃣"), ("4", "4️⃣"),
-             ("5", "5️⃣"), ("6", "6️⃣"), ("7", "7️⃣"), ("8", "8️⃣"), ("9", "9️⃣")]
-        for change in changeSet {
-            result = result.replacingOccurrences(of: change.from, with: change.to)
-        }
-        return result
-    }
-    func withEmo() -> String {
-        var result: String = self
-        let changeSet: [(from: String, to: String)] =
-            [("woman ", "🚺 "), ("man ","🚹 ")]
-        for change in changeSet {
-            result = result.replacingOccurrences(of: change.from, with: change.to)
-        }
-        return result
-    }
-}
-
 enum Mode: CaseIterable { case isVersusHuman, isVersusMachine }
 enum Level: CaseIterable { case isDefault, isEasy, isMedium, isHard }
 
@@ -61,7 +39,7 @@ class Game {
         // MARK: B - MAIN PLAYER
         let mainNamePrompt: String =
             !isRunningTest ? Console.getStringInput(prompt: "your name") : "alex" // #TEST
-        player.main = Human(mainNamePrompt.uppercased()) as Player
+        player.main = HumanPlayer(mainNamePrompt.uppercased()) as Player
         
         // MARK: C - SECOND PLAYER
         switch mode {
@@ -73,10 +51,10 @@ class Game {
                 if secondNamePrompt == player.main.name { Console.write(1, 1, "⚠️ Players can't have the same name : try another ⚠️", 1)}
                 else { break }
             }
-            player.second = Human(secondNamePrompt.uppercased()) as Player
+            player.second = HumanPlayer(secondNamePrompt.uppercased()) as Player
         case .isVersusMachine:
             Console.newSection()
-            player.second = Machine() as Player
+            player.second = MachinePlayer() as Player
             Console.write(0, 0,
                 "Ok \(player.main.name), I'm \(player.second.name) and I'm your opponent !", 0)
             // MARK: D - LEVEL
@@ -138,7 +116,7 @@ extension Game {
             let header = "OK, \(secondToChose.name), it's your turn now."
             _chooseStep_humanChoose(forPlayer: secondToChose, withHeader: header)
         } else {
-            if let machine = firstToChoose as? Machine {
+            if let machine = firstToChoose as? MachinePlayer {
                 // A - First player is Machine ; B - Second is Human
                 _chooseStep_machineChoose(forPlayer: machine)
                 _chooseStep_humanChoose(forPlayer: secondToChose)
@@ -158,9 +136,9 @@ extension Game {
         Console.newSection()
         Console.write(0, 0, header ?? defaultHeader)
         let toonTypes = [
-             (all: Engineer.All, message: "There it goes Engineers :"),
-             (all: Military.All, message: "Time is to pick up a Military now :"),
-             (all: Medical.All, message: "You can finally pick up your Medical :")]
+             (all: EngineerToon.All, message: "There it goes Engineers :"),
+             (all: MilitaryToon.All, message: "Time is to pick up a Military now :"),
+             (all: MedicalToon.All, message: "You can finally pick up your Medical :")]
         var previousNames: [String] = []
         var testIndex = -1
         let testData: [String] = ["toon#1", "toon#2", "toon#3"]
@@ -197,7 +175,7 @@ extension Game {
     }
     private func _chooseStep_machineChoose(forPlayer machine: Player) {
         var results: [(ID: Int, globalSet: Double)] = []
-        let toonClasses = [Engineer.All, Military.All, Medical.All]
+        let toonClasses = [EngineerToon.All, MilitaryToon.All, MedicalToon.All]
         for toonClass in toonClasses { // For each class of toons
             // A - Copy to an array each toon ID and global set
             var maxPromptID: Int = 0
@@ -243,7 +221,7 @@ extension Game {
             turn.swapAt(0, 1)
             
             var didMedicine: Bool = false
-            if let machine = attackingPlayer as? Machine { // Machine autoplay
+            if let machine = attackingPlayer as? MachinePlayer { // Machine autoplay
                 
                 didMedicine =  _fightStep_machinePlayWithIA(withMachine: machine)
                 
@@ -255,7 +233,7 @@ extension Game {
                 // C - Choose one toon
                 let choosenToon: Toon = _fightStep_chooseToon(of: attackingPlayer)
                 // D - Engage in action
-                if let medicalToon = choosenToon as? Medical { didMedicine = _fightStep_isDoctor(withToon: medicalToon)
+                if let medicalToon = choosenToon as? MedicalToon { didMedicine = _fightStep_isDoctor(withToon: medicalToon)
                 } else { _fightStep_isElse(withToon: choosenToon) }
             }
             
@@ -286,7 +264,7 @@ extension Game {
         }
     }
     // MARK: F - a - Medecine
-    private func _fightStep_isDoctor(withToon doctor: Medical) -> Bool {
+    private func _fightStep_isDoctor(withToon doctor: MedicalToon) -> Bool {
         let toonDidMedicine: Bool = _fightStep_isDoctor_DoMedicine(of: attackingPlayer, with: doctor)
         if !toonDidMedicine { // Fight
             _fightStep_chooseDefenderAndFight(withToon: doctor)
@@ -296,19 +274,20 @@ extension Game {
         }
     }
     private func _fightStep_isDoctor_DoMedicine(of player: Player, with choosenToon: Toon) -> Bool {
-        // A - Quit if toon is not a Medical
-        guard let doctor = choosenToon as? Medical else { return false }
-        // B - Prepare prompt text
+        // A - Quit if toon is not a Medical or no Medicine left
+        guard let doctor = choosenToon as? MedicalToon else { return false }
         let pack: [Medicine] = doctor.medicalPack
-        var promptID: Int = 0 ; var promptText: String = ""
+        let medicineIsLeft: Bool = !pack.allSatisfy({ $0.left == 0 })
+        guard medicineIsLeft else { return false }
+        // B - Prepare prompt text
+        var promptID: Int = 1 ; let weaponPromptID: Int = promptID ; var maxPromptID: Int = weaponPromptID ;
+        var promptText: String = "\(String(weaponPromptID).withNum()). Use \(doctor.getHisOrHer())\(doctor.weapon!.getPicWithName()) : it blows haters to smithereens"
         for index in 0...2 {
             if pack[index].left > 0 {
-                promptID += 1 ; pack[index].promptID = promptID
-                promptText += "\(promptID). Use \(doctor.getHisOrHer())\(pack[index].getPicWithName()) : \(pack[index].about)\n"
+                promptID += 1 ; maxPromptID = promptID; pack[index].promptID = promptID
+                promptText += "\n\(String(promptID).withNum()). Use \(doctor.getHisOrHer())\(pack[index].getPicWithName()) : \(pack[index].about)"
             } else { pack[index].promptID = 0 }
         }
-        let weaponPromptID: Int = promptID + 1 ; let maxPromptID = weaponPromptID
-        promptText += "\(weaponPromptID). Use \(doctor.getHisOrHer())\(doctor.weapon!.getPicWithName()) : it blows haters to smithereens"
         // C - Call prompt and get result
         Console.write(1, 1, """
             What do you want to do with \(doctor.getPicWithName()) ?
@@ -319,7 +298,7 @@ extension Game {
         _fightStep_isDoctor_ApplyMedecine(ofPlayer: doctor, withID: promptForMedicine)
         return true
     }
-    private func _fightStep_isDoctor_ApplyMedecine(ofPlayer doctor: Medical, withID medicineID:Int) {
+    private func _fightStep_isDoctor_ApplyMedecine(ofPlayer doctor: MedicalToon, withID medicineID:Int) {
         var restoredHitpoints: Int // #STAT
         let choosenMedicine: Medicine = doctor.medicalPack.first(where: { $0.promptID == medicineID })!
         if let teamUseMedicine = choosenMedicine as? TeamUseMedicine {
@@ -331,7 +310,7 @@ extension Game {
                 let toon = attackingPlayer.toons[index]
                 if toon.isAlive() {
                     maxPromptID += 1 ; toon.promptID = maxPromptID
-                    promptText += "\(toon.promptID). \(toon.getPicWithName()) with \(toon.getHitpointsAndPercent()) \n"
+                    promptText += "\(String(toon.promptID).withNum()). \(toon.getPicWithName()) with \(toon.getHitpointsAndPercent()) \n"
                 } else { toon.promptID = 0 }
             }
             Console.write(1, 1, """
@@ -355,7 +334,7 @@ extension Game {
             let toon = defendingPlayer.toons[index]
             if toon.isAlive() {
                 maxPromptID += 1 ; toon.promptID = maxPromptID
-                promptText += "\(toon.promptID). \(toon.getPicWithName()) with \(toon.getHitpointsAndPercent()) \n"
+                promptText += "\(String(toon.promptID).withNum()). \(toon.getPicWithName()) with \(toon.getHitpointsAndPercent()) \n"
             } else { toon.promptID = 0 }
         }
         Console.write(0, 1, """
@@ -405,7 +384,7 @@ extension Game {
     }
     
     // MARK: F - c - Machine
-    private func _fightStep_machinePlayWithIA(withMachine machine: Machine) -> Bool {
+    private func _fightStep_machinePlayWithIA(withMachine machine: MachinePlayer) -> Bool {
         var didMedicine: Bool = false
         let action = machine.PlayWithIA(game: self)
         if let doAttack = action.attackCase {
@@ -418,7 +397,7 @@ extension Game {
                 return didMedicine
             }
             Console.write(0, 1, "⚙️ \(attackingPlayer.name) made a choice and decided to use medicine :", 0)
-            let doctor: Medical = machine.toons.first(where: { $0.self is Medical }) as! Medical
+            let doctor: MedicalToon = machine.toons.first(where: { $0.self is MedicalToon }) as! MedicalToon
             let medicine = doMedicine.useMedicine ; let toon = doMedicine.onToon
             _fightStep_machineApplyMedicine(doctor: doctor, medicine: medicine, onToon: toon)
             didMedicine = true
@@ -432,7 +411,7 @@ extension Game {
         _figthStep_Report(from: attacker, to: defender, of: Double(damage))
     }
     
-    private func _fightStep_machineApplyMedicine(doctor: Medical, medicine: Medicine, onToon toon: Toon?) {
+    private func _fightStep_machineApplyMedicine(doctor: MedicalToon, medicine: Medicine, onToon toon: Toon?) {
         var restoredHitpoints: Int // #STAT
         if let teamUseMedicine = medicine as? TeamUseMedicine {
             restoredHitpoints = teamUseMedicine.use(OnTeam: attackingPlayer) // #STAT

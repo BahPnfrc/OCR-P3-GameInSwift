@@ -17,9 +17,17 @@ class TeamUseMedicine: Medicine {
                 restored += restoreHitpointsWithStats(ofToon: toon, to: Int(expectedHitpoints))
             }
         }
+        var restoredText: String = ""
+        if (0...0).contains(restored) {
+            restoredText = "They gained no hitpoints so it was a pure waste 👎"
+        } else if (1...300).contains(restored) {
+            restoredText = "They gained a few set of \(restored) hitpoints 👍"
+        } else {
+            restoredText = "They gained a whole bunch of \(restored) hitpoints 💪"
+        }
         Console.write(1, 1, """
             Team of \(player.name) experienced the \(self.getPicWithName()) :
-            They gained a total of \(restored) hitpoints 💪
+            \(restoredText.withNum())
             """, 1)
         self.left -= 1
         return restored // #STAT

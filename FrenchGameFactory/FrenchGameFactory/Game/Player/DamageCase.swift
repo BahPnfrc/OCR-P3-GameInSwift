@@ -7,7 +7,7 @@
 
 import Foundation
 
-class DmgCase {
+class DamageCase {
     
     let attacker: Toon
     let defender: Toon

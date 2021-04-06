@@ -163,22 +163,22 @@ class Toon: LifeSet, SkillSet, FightSet, StatSet {
 
         switch self.gender {
         case .isMan:
-            self.skillSet.strenght *= Modifier.bonus()
-            self.skillSet.accuracy *= Modifier.malus()
+            self.skillSet.strenght *= ToonModifier.bonus()
+            self.skillSet.accuracy *= ToonModifier.malus()
         case .isWoman:
-            self.skillSet.strenght *= Modifier.malus()
-            self.skillSet.accuracy *= Modifier.bonus()
+            self.skillSet.strenght *= ToonModifier.malus()
+            self.skillSet.accuracy *= ToonModifier.bonus()
 
         switch self.age {
         case .isJunior:
-            self.skillSet.forsight *= Modifier.malus()
-            self.skillSet.agility *= Modifier.bonus()
+            self.skillSet.forsight *= ToonModifier.malus()
+            self.skillSet.agility *= ToonModifier.bonus()
         case .isAdult:
-            self.skillSet.forsight *= Modifier.same()
-            self.skillSet.agility *= Modifier.same()
+            self.skillSet.forsight *= ToonModifier.same()
+            self.skillSet.agility *= ToonModifier.same()
         case .isSenior:
-            self.skillSet.forsight *= Modifier.bonus()
-            self.skillSet.agility *= Modifier.malus()
+            self.skillSet.forsight *= ToonModifier.bonus()
+            self.skillSet.agility *= ToonModifier.malus()
             }
         }
     }
@@ -208,9 +208,9 @@ extension Toon {
 extension Toon {
     
     static func resetAllPromptID() {
-        for toon in Engineer.All { toon.promptID = 0 }
-        for toon in Military.All { toon.promptID = 0 }
-        for toon in Medical.All { toon.promptID = 0 }
+        for toon in EngineerToon.All { toon.promptID = 0 }
+        for toon in MilitaryToon.All { toon.promptID = 0 }
+        for toon in MedicalToon.All { toon.promptID = 0 }
     }
     
     func getHeOrShe(withMaj:Bool = false) -> String {
@@ -241,7 +241,7 @@ extension Toon {
         return name + " : " + age + " " + tool
     }
     func getFightPrompt() -> String {
-        let name : String = String(promptID) + ". " + getPicWithName()
+        let name : String = String(promptID).withNum() + ". " + getPicWithName()
         let tool : String = weapon!.getPicWithName()
         return name + " with " + getHisOrHer() + tool
     }
@@ -256,8 +256,10 @@ extension Toon {
     
     func getLifeBar(withBlocks blocks: Int = 28) -> String {
         // A - Percent as a string
-        let percentLeft: Int = getPercentLeft()
-        let percentAsString = " " + String(percentLeft) + "%"
+        let percentLeft: Int = self.getPercentLeft()
+        var percentText: String = String(percentLeft)
+        if percentLeft == 0 && self.isAlive() { percentText = "≈0"}
+        let percentAsString = " " + percentText + "%"
         // B - Percent as a picture
         let barLenght: Int = blocks
         let model: [(percent: Int, block: String)] =

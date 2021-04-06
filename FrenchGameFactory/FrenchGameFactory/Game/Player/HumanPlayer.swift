@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class Human: Player { // COM
+final class HumanPlayer: Player { // COM
     init(_ name: String) {
         super.init(named: name)
     }

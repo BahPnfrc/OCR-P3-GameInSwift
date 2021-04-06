@@ -7,35 +7,34 @@
 
 import Foundation
 
-final class Machine: Player {
+final class MachinePlayer: Player {
     
     private static let randomNames: [String] = []
     private static var randomName: String {
-            Machine.randomNames.count > 0 ?
-            Machine.randomNames.randomElement()!:
+            MachinePlayer.randomNames.count > 0 ?
+            MachinePlayer.randomNames.randomElement()!:
             "MACHINE"}
     
-    //private let game: Game
-    private var attackCasesOnN0: [DmgCase] = []
-    private var defenseCasesOnN1: [DmgCase] = []
+    private var attackCasesOnN0: [DamageCase] = []
+    private var defenseCasesOnN1: [DamageCase] = []
     
     init(_ name: String?) {
         guard let name = name else {
-            super.init(named: Machine.randomName)
+            super.init(named: MachinePlayer.randomName)
             return
         }
         super.init(named: name)
     }
     
     convenience init() {
-        self.init(Machine.randomName)
+        self.init(MachinePlayer.randomName)
     }
     
-    // MARK: Machine IA Play
+    // MARK: A - Machine IA Play
     func PlayWithIA (game: Game)
-    -> (attackCase: DmgCase?, medicineCase: (useMedicine: Medicine, onToon: Toon?)?){
+    -> (attackCase: DamageCase?, medicineCase: (useMedicine: Medicine, onToon: Toon?)?){
         // A - Get players
-        let machine: Player = game.attackingPlayer as! Machine
+        let machine: Player = game.attackingPlayer as! MachinePlayer
         let human: Player = game.defendingPlayer
         // B - Get all damages toons can deal to each others
         self.attackCasesOnN0 = _getAllDamageCases( // On this round N0
@@ -52,18 +51,18 @@ final class Machine: Player {
         }
     }
     
-    // MARK: IA Play easy
+    // MARK: A1 - Play easy
     private func _atLevelEasy()
-    -> (attackCase: DmgCase?, medicineCase: (useMedicine: Medicine, onToon: Toon?)?) {
+    -> (attackCase: DamageCase?, medicineCase: (useMedicine: Medicine, onToon: Toon?)?) {
         attackCasesOnN0.sort { $0.damage < $1.damage }
         defenseCasesOnN1.sort { $0.damage < $1.damage }
-        let lowestDamage: DmgCase = attackCasesOnN0[0]
+        let lowestDamage: DamageCase = attackCasesOnN0[0]
         return (lowestDamage, nil)
     }
     
-    // MARK: IA Play medium
+    // MARK: A2 - Play medium
     private func _atLevelMedium()
-    -> (attackCase: DmgCase?, medicineCase: (useMedicine: Medicine, onToon: Toon?)?) {
+    -> (attackCase: DamageCase?, medicineCase: (useMedicine: Medicine, onToon: Toon?)?) {
         attackCasesOnN0.sort { $0.damage > $1.damage }
         defenseCasesOnN1.sort { $0.damage > $1.damage }
         
@@ -86,9 +85,9 @@ final class Machine: Player {
         }
     }
     
-    // MARK: IA Play hard
+    // MARK: A3 - Play hard
     private func _atLevelHard()
-    -> (attackCase: DmgCase?, medicineCase: (useMedicine: Medicine, onToon: Toon?)?){
+    -> (attackCase: DamageCase?, medicineCase: (useMedicine: Medicine, onToon: Toon?)?){
             
         attackCasesOnN0.sort { $0.damage > $1.damage }
         defenseCasesOnN1.sort { $0.damage > $1.damage }
@@ -145,31 +144,31 @@ final class Machine: Player {
         }
     }
     
-    // MARK: Damage check
+    // MARK: B - Check for damages
     private func _aliveOnly(_ toons: [Toon]) -> [Toon] {
         return toons.filter({ $0.isAlive() == true })
     }
 
-    private func _getAllDamageCases(attackers: [Toon], defenders: [Toon]) -> [(DmgCase)] {
-        var results: [DmgCase] = []
+    private func _getAllDamageCases(attackers: [Toon], defenders: [Toon]) -> [(DamageCase)] {
+        var results: [DamageCase] = []
         for attacker in attackers{
             for defender in defenders{
                 let damage: Double = Weapon.getDamage(from: attacker, to: defender)
                 let isLethal: Bool = defender.lifeSet.hitpoints - Int(damage) <= 0
-                let dmgProfil: DmgCase = DmgCase(
+                let damageCase: DamageCase = DamageCase(
                     attacker: attacker,
                     defender: defender,
                     damage: damage,
                     isLethal: isLethal)
-                results.append(dmgProfil)
+                results.append(damageCase)
             }
         }
         return results
     }
 
-    // MARK: Hard level check
-    private func _canTakeToonOrBestCase(attackCases: [DmgCase])
-    -> (result: Bool, playPattern: DmgCase) {
+    // MARK: C - Check for scenarii
+    private func _canTakeToonOrBestCase(attackCases: [DamageCase])
+    -> (result: Bool, playPattern: DamageCase) {
         guard let canKillCase = attackCases.first(where: {$0.isLethal == true}) else {
             let elseCase = attackCases[0] // Top case after sort
             return (false, elseCase)
@@ -177,8 +176,8 @@ final class Machine: Player {
         return (true, canKillCase)
     }
 
-    private func _canLoseToonOrWorstCase(defenseCases: [DmgCase])
-    -> (result: Bool, playPattern: DmgCase) {
+    private func _canLoseToonOrWorstCase(defenseCases: [DamageCase])
+    -> (result: Bool, playPattern: DamageCase) {
         guard let canBeKilledCase = defenseCases.first(where: {$0.isLethal == true}) else {
             let elseCase = defenseCases[0] // Top case after sort
             return (false, elseCase)
@@ -186,8 +185,8 @@ final class Machine: Player {
         return (true, canBeKilledCase)
     }
 
-    private func _canTakeOutNextRoundThreat(attackCases: [DmgCase], defenseCases: [DmgCase])
-    -> (result: Bool, playPattern: DmgCase?) {
+    private func _canTakeOutNextRoundThreat(attackCases: [DamageCase], defenseCases: [DamageCase])
+    -> (result: Bool, playPattern: DamageCase?) {
         for defenseCase in defenseCases {
             if defenseCase.isLethal {
                 for attackCase in attackCases {
@@ -208,16 +207,16 @@ final class Machine: Player {
         return machineToons > humanToons ? true : false
     }
 
-    // MARK: Medical check
-    private func _shouldAttackDoctor(attackCases: [DmgCase])
-    -> (result: Bool, playPattern: DmgCase?) {
+    // MARK: D - Check for medical
+    private func _shouldAttackDoctor(attackCases: [DamageCase])
+    -> (result: Bool, playPattern: DamageCase?) {
         // A - Pick only cases where defender is Medical
-        var attackOnDoctor = attackCases.filter({ $0.defender is Medical})
+        var attackOnDoctor = attackCases.filter({ $0.defender is MedicalToon})
         guard attackOnDoctor.count > 0 else { return (false, nil) }
         // B - Sort them by highest damage
         attackOnDoctor.sort { $0.damage > $1.damage }
         // C - If any medicine is left then attack
-        let doctor = attackOnDoctor[0].defender as! Medical
+        let doctor = attackOnDoctor[0].defender as! MedicalToon
         if !doctor.medicalPack.allSatisfy({ $0.left == 0 }) {
             return (true, attackOnDoctor[0])
         }
@@ -227,8 +226,8 @@ final class Machine: Player {
     private func _shouldUseMedicine(machine: Player)
     -> (result: Bool, withMedicine: Medicine?, onToon: Toon?){
         // A - See if doctor and medicines are left
-        guard let isDoctor = machine.toons.first(where: { $0.self is Medical }) else { return (false, nil, nil) }
-        let doctor: Medical = isDoctor as! Medical ; guard doctor.isAlive() else { return (false, nil, nil) }
+        guard let isDoctor = machine.toons.first(where: { $0.self is MedicalToon }) else { return (false, nil, nil) }
+        let doctor: MedicalToon = isDoctor as! MedicalToon ; guard doctor.isAlive() else { return (false, nil, nil) }
         guard !doctor.medicalPack.allSatisfy({ $0.left == 0 }) else { return (false, nil, nil) }
         // B - Get all medicine use cases in array
         var medicineCases: [(toon: Toon, medicine: Medicine, gain: Int)] = []
@@ -249,7 +248,7 @@ final class Machine: Player {
         if toonsUnderPercent50.count > 1 && toonsUnderPercent50.allSatisfy( {$0.gain > 150 } ) {
             // C1 - Heavy medicine use if 2 toons at least are under 50%
             return (true, toonsUnderPercent50[0].medicine, nil)
-        } else if toonsUnderPercent70.count > 0 {
+        } else if toonsUnderPercent90.count > 0 {
             // C2 - Medium medicine use if 1 toon is under 90%
             toonsUnderPercent90.sort { $0.gain > $1.gain }
             return (true, toonsUnderPercent90[0].medicine, toonsUnderPercent90[0].toon)
@@ -257,8 +256,9 @@ final class Machine: Player {
             // C3 - Light medicine use if 1 toon is under 70%
             toonsUnderPercent70.sort { $0.gain > $1.gain }
             return (true, toonsUnderPercent70[0].medicine, toonsUnderPercent70[0].toon)
-        } else {
+        } else if toonsUnderPercent50.count == 1 { // C4 - Single 50% use
             return (true, toonsUnderPercent50[0].medicine, nil)
-        }
+        } // No case matched
+        else { return (false, nil, nil) }
     }
 }

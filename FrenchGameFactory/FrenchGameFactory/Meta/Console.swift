@@ -4,19 +4,14 @@
 //
 //  Created by Pierre-Alexandre on 02/03/2021.
 //
-// https://www.raywenderlich.com/511-command-line-programs-on-macos-tutorial
-// https://www.journaldev.com/19612/swift-readline-swift-print
 
 import Foundation
 
 class Console {
-    
-    // Upon running a program the path to its executable is passed as argument[0]
-    // Argument[0] is accessible through the global CommandLine enum
-    static let executableName = (CommandLine.arguments[0] as NSString).lastPathComponent
 
     enum OutputType { case error, standard }
-
+    
+    // MARK: Write functions
     static func write(
         _ lineBefore: Int = 0,
         _ tab: Int = 0,
@@ -50,6 +45,7 @@ class Console {
         print("\t")
     }
     
+    // MARK: Errors
     enum InputError: Error {
         case noInput (info: String = "No input was found")
         case intExpected (info: String = "No number was found")

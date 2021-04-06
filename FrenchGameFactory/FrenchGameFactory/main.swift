@@ -8,10 +8,10 @@
 
 import Foundation
 
-Engineer.createAll()
-Medical.createAll()
-Military.createAll()
-
+// Create all toons
+EngineerToon.createAll()
+MedicalToon.createAll()
+MilitaryToon.createAll()
+// Run the game
 let game = Game()
 game.run()
-

@@ -8,12 +8,12 @@
 import Foundation
 
 // MARK: Daughter : Military
-final class Military: Toon {
+final class MilitaryToon: Toon {
     
     private static var newID: Int = 0
     private static func getNewID() -> Int {
-        Military.newID += 1
-        return Military.newID
+        MilitaryToon.newID += 1
+        return MilitaryToon.newID
     }
     
     init(withGender gender: Gender,
@@ -22,22 +22,22 @@ final class Military: Toon {
          withTitle title: String) {
         
         super.init(
-            withID: Military.getNewID(),
+            withID: MilitaryToon.getNewID(),
             withGender: gender,
             withAge: age,
             withPic: pic,
             withTitle: title)
         
         // Malus = Biologic, Bonus = Thermic
-        self.fightSet.biologic.defense *= Modifier.malus()
-        self.fightSet.biologic.attack *= Modifier.malus()
-        self.fightSet.kinetic.defense *= Modifier.same()
-        self.fightSet.kinetic.attack *= Modifier.same()
-        self.fightSet.thermic.defense *= Modifier.bonus()
-        self.fightSet.thermic.attack *= Modifier.bonus()
+        self.fightSet.biologic.defense *= ToonModifier.malus()
+        self.fightSet.biologic.attack *= ToonModifier.malus()
+        self.fightSet.kinetic.defense *= ToonModifier.same()
+        self.fightSet.kinetic.attack *= ToonModifier.same()
+        self.fightSet.thermic.defense *= ToonModifier.bonus()
+        self.fightSet.thermic.attack *= ToonModifier.bonus()
     }
     
-    static var All: [Toon] = [Military]()
+    static var All: [Toon] = [MilitaryToon]()
     static func createAll(){
         var toon: (pic: String, title: String)
         var weapon: (pic: String, name: String)
@@ -57,7 +57,7 @@ final class Military: Toon {
                 case (.isSenior, .isWoman):
                     toon = ("🕵️‍♀️", "Secret Service") ; weapon = ("🕳", "Wicked Weapon")
             }
-            let newMilitary: Military = Military(
+            let newMilitary: MilitaryToon = MilitaryToon(
                 withGender: gender,
                 withAge: age,
                 withPic: toon.pic,
