@@ -136,4 +136,8 @@ class Console {
         guard let typedText = readLine() else { return false }
         return typedText == exitWord
     }
+    static func getSimplePrompt() {
+        Console.write(0, 0, "➡️ Press 'Enter' to continue ✅", 0)
+        _ = readLine()
+    }
 }

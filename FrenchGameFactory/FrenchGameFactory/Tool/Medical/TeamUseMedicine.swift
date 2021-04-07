@@ -14,6 +14,7 @@ class TeamUseMedicine: Medicine {
         let expectedHitpoints: Double = Double(Setting.Toon.defaultLifeSet.hitpoints) * self.factor
         for toon in player.toons {
             if toon.isAlive() {
+                if toon.lifeSet.isSick == true { toon.lifeSet.isSick = false }
                 restored += restoreHitpointsWithStats(ofToon: toon, to: Int(expectedHitpoints))
             }
         }
@@ -25,7 +26,7 @@ class TeamUseMedicine: Medicine {
         } else {
             restoredText = "They gained a whole bunch of \(restored) hitpoints 💪"
         }
-        Console.write(1, 1, """
+        Console.write(0, 1, """
             Team of \(player.name) experienced the \(self.getPicWithName()) :
             \(restoredText.withNum())
             """, 1)

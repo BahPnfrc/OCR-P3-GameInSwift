@@ -51,21 +51,21 @@ class Medicine : Tool {
                 withType: .isLight,
                 withFactor: 0.7,
                 withLeft: 1,
-            withAbout: "it restores receiver health to 70%".withNum())
+            withAbout: "it restores receiver HP to 70%".withNum())
         let medium: SingleUseMedicine = SingleUseMedicine(
                 withPic: "💊",
                 withName: "Precision Pill",
                 withType: .isMedium,
                 withFactor: 0.9,
                 withLeft: 1,
-                withAbout: "it restores receiver health to 90%".withNum())
+                withAbout: "it restores receiver HP to 90%".withNum())
         let heavy: TeamUseMedicine = TeamUseMedicine(
                 withPic: "🧬",
                 withName: "Dna Denaturator",
                 withType: .isHeavy,
                 withFactor: 0.5,
                 withLeft: 1,
-                withAbout: "it restores all toons health to 50%".withNum())
+                withAbout: "it restores all toons HP to 50%".withNum())
         return [light, medium, heavy]
     }
     

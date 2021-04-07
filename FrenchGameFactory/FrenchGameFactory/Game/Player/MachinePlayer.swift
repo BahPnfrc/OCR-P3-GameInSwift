@@ -66,22 +66,42 @@ final class MachinePlayer: Player {
         attackCasesOnN0.sort { $0.damage > $1.damage }
         defenseCasesOnN1.sort { $0.damage > $1.damage }
         
-        // A - Do basic checks first
-        let shoudlUseMedicine = _shouldUseMedicine(machine: game.attackingPlayer)
-      
-        switch shoudlUseMedicine.result {
-        case true: // B1 - Team suffers injuries
+        // A1 - Remove highest and lowest damage cases
+        let removeCases: [(upperBound: Int, removeFirst: Int, removeLast: Int)]
+            = [(9, 2, 3), (6, 1, 2), (3, 0, 1)]
+        for removeCase in removeCases {
+            if attackCasesOnN0.count >= removeCase.upperBound {
+                if removeCase.removeFirst > 0 { for _ in 1...removeCase.removeFirst { attackCasesOnN0.removeFirst() }}
+                if removeCase.removeLast > 0 { for _ in 1...removeCase.removeLast { attackCasesOnN0.removeLast() }}
+                break
+            }
+        }
+        
+        // A2 - Do basic checks first
+        let canLoseToonOrWorstCase = _canLoseToonOrWorstCase(defenseCases: defenseCasesOnN1)
+        
+        switch canLoseToonOrWorstCase.result {
+        case true: // B1 - Machine can lose toon on N1
             
-            guard let returnedMedicine = shoudlUseMedicine.withMedicine else { fallthrough }
-            if returnedMedicine.type == .isHeavy { return (nil, (returnedMedicine, nil))
-            } else {
-                guard let returnedToon = shoudlUseMedicine.onToon else { fallthrough }
-                return (nil, (returnedMedicine, returnedToon))
+            let shoudlUseMedicine = _shouldUseMedicine(machine: game.attackingPlayer)
+            
+            switch shoudlUseMedicine.result {
+            case true: // C1 - Team suffers injuries
+                
+                guard let returnedMedicine = shoudlUseMedicine.withMedicine else { fallthrough }
+                if returnedMedicine.type == .isHeavy { return (nil, (returnedMedicine, nil))
+                } else {
+                    guard let returnedToon = shoudlUseMedicine.onToon else { fallthrough }
+                    return (nil, (returnedMedicine, returnedToon))
+                }
+                
+            case false: // C2 - Team suffers not injuries
+                
+                return (attackCasesOnN0.randomElement()!, nil)
             }
             
-        case false: // B2 - Team suffers not injuries
-            
-            return (attackCasesOnN0[0], nil)
+        case false: // B2 - Machine can't lose toon on N1
+            return (attackCasesOnN0.randomElement()!, nil)
         }
     }
     

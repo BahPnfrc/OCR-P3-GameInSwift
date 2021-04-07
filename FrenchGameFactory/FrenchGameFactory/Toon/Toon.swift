@@ -203,6 +203,15 @@ extension Toon {
         rightArray.removeFirst()
         return randomName
     }
+    static func getStaticRandomName(forToon toon: Toon) -> String {
+        var randomName: String
+        var rightArray = toon.gender == .isMan ?
+            Toon.defaultNameForMan : Toon.defaultnameForWoman
+        rightArray.shuffle()
+        randomName = rightArray.first!
+        rightArray.removeFirst()
+        return randomName
+    }
 }
 // MARK: Extension : Retrieve data
 extension Toon {
@@ -228,10 +237,9 @@ extension Toon {
     }
     func getPicWithName() -> String {
         var pic = self.pic
-        if !isAlive() { pic = "❌" + pic}
-        guard let name = name else {
-            return  pic + " " + title
-        }
+        if !isAlive() { pic = "❌" + pic }
+        else if self.lifeSet.isSick == true { pic = "🦠" + pic }
+        guard let name = name else { return  pic + " " + title }
         return pic + " " + title + " " + name
     }
     func getChooseToonPrompt() -> String {
@@ -251,7 +259,7 @@ extension Toon {
     }
     
     func getHitpointsAndPercent() -> String {
-        return "\(self.lifeSet.hitpoints) hitpoints left : \(getPercentLeft())%"
+        return "\(self.lifeSet.hitpoints) HP left : \(getPercentLeft())%"
     }
     
     func getLifeBar(withBlocks blocks: Int = 28) -> String {

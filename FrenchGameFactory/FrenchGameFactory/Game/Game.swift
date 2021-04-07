@@ -8,7 +8,8 @@
 import Foundation
 
 enum Mode: CaseIterable { case isVersusHuman, isVersusMachine }
-enum Level: CaseIterable { case isDefault, isEasy, isMedium, isHard }
+enum Level: String, CaseIterable { case isDefault, isEasy = "Easy", isMedium = "Medium", isHard = "Hard"}
+enum Order: String, CaseIterable { case first = "First", second = "Second", chance = "Chance"}
 
 class Game {
     
@@ -22,23 +23,26 @@ class Game {
     var attackingPlayer: Player { return queue[0]}
     var defendingPlayer: Player { return queue[1]}
     
-    var isRunningTest: Bool = true // #TEST
-    
     init(){
         // MARK: A - MODE
-        Console.write(0, 0, "✨🕹✨ WELCOME TO THE GAME ✨🕹✨")
+        Console.write(0, 1, """
+            ✨🦠✨ WELCOME TO MY GAME ✨🍄✨
+            """)
         Console.write(1, 1, """
             How do you want to play ?
             1. 🧠 Against a friend
             2. ⚙️ Against the machine
+            3. 🕣 Fast play using default setting
             """.withNum(), 1)
-        let modePrompt:Int =
-            !isRunningTest ? Console.getIntInput(fromTo: 1...2) : 2 // #TEST
-        mode = modePrompt == 1 ? .isVersusHuman: .isVersusMachine
+        let modePrompt:Int = !Setting.Game.fastPlayEnabled ? Console.getIntInput(fromTo: 1...3) : 2
+
+        if modePrompt == 3 {
+            Setting.Game.fastPlayEnabled = true
+            self.mode = .isVersusMachine
+        } else { mode = modePrompt == 1 ? .isVersusHuman: .isVersusMachine }
         
         // MARK: B - MAIN PLAYER
-        let mainNamePrompt: String =
-            !isRunningTest ? Console.getStringInput(prompt: "your name") : "alex" // #TEST
+        let mainNamePrompt: String = Console.getStringInput(prompt: "your name")
         player.main = HumanPlayer(mainNamePrompt.uppercased()) as Player
         
         // MARK: C - SECOND PLAYER
@@ -46,8 +50,7 @@ class Game {
         case .isVersusHuman:
             var secondNamePrompt: String = ""
             while true {
-                secondNamePrompt =
-                    !isRunningTest ? Console.getStringInput(prompt: "the other player's name") : "andre" // #TEST
+                secondNamePrompt = Console.getStringInput(prompt: "the other player's name")
                 if secondNamePrompt == player.main.name { Console.write(1, 1, "⚠️ Players can't have the same name : try another ⚠️", 1)}
                 else { break }
             }
@@ -60,16 +63,17 @@ class Game {
             // MARK: D - LEVEL
             Console.write(1, 1, """
                 How do you want me to be ?
-                1. 🌸 Easy. Because you're soft and delicate
-                2. 🏓 Medium. For a real one on one baby
-                3. 🪖 Hard. I'll unleash my full potential
+                1. 🌸 Easy. I'll do low damages with no medicine
+                2. 🏓 Medium. I'll do balanced damages and use medicine
+                3. 🪖 Hard. I'll do high damages and use medicine
                 """.withNum(), 1)
-            let levelPrompt: Int =
-                !isRunningTest ? Console.getIntInput(fromTo: 1...3) : 3 // #TEST
-            level =
-                levelPrompt == 1 ? .isEasy:
-                levelPrompt == 2 ? .isMedium:
-                .isHard
+            if Setting.Game.fastPlayEnabled {
+                level = Setting.Game.fastPlayLevel
+                Console.write(0, 2, "ℹ️. Default setting was applied : \(level.rawValue) ✅", 0)
+            } else {
+                let levelPrompt: Int = Console.getIntInput(fromTo: 1...3) // #TEST
+                level = levelPrompt == 1 ? .isEasy: levelPrompt == 2 ? .isMedium: .isHard
+            }
         }
     }
     
@@ -92,15 +96,23 @@ extension Game {
             """)
         Console.write(1, 1, """
             Who choose first ?
-            1. 🏆 I want to choose first no matter what
-            2. 🎳 I'd prefer to shoot first so I'll choose second
-            3. 🎲 I'd rather roll the dice and let chance decide
+            1. 🏆 First. I want to choose first no matter what
+            2. 🎳 Second. I'd prefer to shoot first so I'll choose second
+            3. 🎲 Chance. I'd rather roll the dice and let chance decide
             """.withNum(), 1)
-        let orderPrompt: Int =
-            !isRunningTest ? Console.getIntInput(fromTo: 1...3) : 2
+        let orderPrompt: (number: Int, text: String )
+        if Setting.Game.fastPlayEnabled {
+            orderPrompt =
+                Setting.Game.fastPlayOrder == .first ? (1, Order.first.rawValue) :
+                Setting.Game.fastPlayOrder == .second ? (2, Order.second.rawValue) :
+                (3, Order.chance.rawValue)
+            Console.write(0, 2, "ℹ️. Default setting was applied : \(orderPrompt.text) ✅", 0)
+        } else {
+            orderPrompt.number = Console.getIntInput(fromTo: 1...3)
+        }
         queue =
-            orderPrompt == 1 ? [player.main, player.second] :
-            orderPrompt == 2 ? [player.second, player.main] :
+            orderPrompt.number == 1 ? [player.main, player.second] :
+            orderPrompt.number == 2 ? [player.second, player.main] :
             [player.main, player.second].shuffled()
     }
 }
@@ -119,12 +131,14 @@ extension Game {
             if let machine = firstToChoose as? MachinePlayer {
                 // A - First player is Machine ; B - Second is Human
                 _chooseStep_machineChoose(forPlayer: machine)
+                _chooseStep_machineReportChoose(forPlayer: machine, as: .first)
                 _chooseStep_humanChoose(forPlayer: secondToChose)
             }
             else {
                 // A - First player is Human ; B - Second is Machine
                 _chooseStep_humanChoose(forPlayer: firstToChoose)
                 _chooseStep_machineChoose(forPlayer: secondToChose)
+                _chooseStep_machineReportChoose(forPlayer: secondToChose, as: .second)
             }
         }
     }
@@ -140,10 +154,7 @@ extension Game {
              (all: MilitaryToon.All, message: "Time is to pick up a Military now :"),
              (all: MedicalToon.All, message: "You can finally pick up your Medical :")]
         var previousNames: [String] = []
-        var testIndex = -1
-        let testData: [String] = ["toon#1", "toon#2", "toon#3"]
         for toonType in toonTypes { // For each type of toon
-            testIndex += 1
             // A - Show message and list all toons
             var promptText: String = ""
             Console.write(1, 1, toonType.message, 0)
@@ -156,21 +167,28 @@ extension Game {
             }
             Console.write(0, 1, promptText.withNum().withEmo(), 0)
             // B - Prompt to choose a toon by its ID
-            Console.emptyLine()
             let promptForNumber: Int =
-                !isRunningTest ? Console.getIntInput(fromTo: 1...maxPromptID) : testIndex + 1 // #TEST
+                !Setting.Game.fastPlayEnabled ? Console.getIntInput(fromTo: 1...maxPromptID) : (1...maxPromptID).randomElement()!
             let chosenToon: Toon = toonType.all.first(where: {$0.promptID == promptForNumber})!
             // C - Prompt to choose a name for this toon
             var promptForName: String = ""
             while true {
-                promptForName =
-                    !isRunningTest ? Console.getStringInput(prompt: "a name for this toon") : testData[testIndex] // #TEST
-                if previousNames.contains(promptForName){ Console.write(1, 1, "⚠️ Toons can't have the same name : try another ⚠️", 1)}
+                promptForName = !Setting.Game.fastPlayEnabled ?
+                    Console.getStringInput(prompt: "a name for this toon") :
+                    Toon.getStaticRandomName(forToon: chosenToon)
+                if previousNames.contains(promptForName){
+                    if Setting.Game.fastPlayEnabled == false {
+                        Console.write(1, 1, "⚠️ Toons can't have the same name : try another ⚠️", 1)
+                    }
+                }
                 else { previousNames.append(promptForName) ; break }
             }
             chosenToon.name = promptForName.uppercased()
             chosenToon.isInTeam = true
             human.toons.append(chosenToon)
+            if Setting.Game.fastPlayEnabled == true {
+                Console.write(0, 2, "ℹ️. Random toon was choosed : \(chosenToon.getPicWithName()) ✅", 0)
+            }
         }
     }
     private func _chooseStep_machineChoose(forPlayer machine: Player) {
@@ -200,7 +218,17 @@ extension Game {
         }
         
     }
-    
+    private func _chooseStep_machineReportChoose(forPlayer machine: Player, as order: Order) {
+        var reportText: String = ""
+        for toon in machine.toons {
+            let text = "ℹ️. " + toon.getPicWithName() + " with \(toon.getHisOrHer())\(toon.weapon!.getPicWithName()) ✅\n"
+            reportText.append(text)
+        }
+        if order == .first {
+            Console.write(1, 1, "⚙️ \(machine.name) choosed first and decided to pick :\n" + reportText, 0)
+        } else {  Console.write(1, 1, "⚙️ \(machine.name) made a choice and finally picked :\n" + reportText, 0) }
+        Console.getSimplePrompt()
+    }
 }
 
 // MARK: F - FIGHT
@@ -217,11 +245,11 @@ extension Game {
             Console.newSection()
             // A - Pick one player
             switchPlayers() // Attacker and defender are switched
-            Console.write(0, 0, "➡️ Round #️⃣\(round)\(turn[0]) : 🔔 *Ding Ding* \(attackingPlayer.name) on stage, Fight 🥊 !".withNum(), 1)
+            Console.write(0, 0, "➡️ Round #️⃣\(round)\(turn[0]) : 🔔 *Ding Ding Ding* \(attackingPlayer.name) on stage, Fight 🥊 !".withNum(), 1)
             turn.swapAt(0, 1)
             
             var didMedicine: Bool = false
-            if let machine = attackingPlayer as? MachinePlayer { // Machine autoplay
+            if let machine = attackingPlayer as? MachinePlayer { // Machine IA autoplay
                 
                 didMedicine =  _fightStep_machinePlayWithIA(withMachine: machine)
                 
@@ -233,12 +261,19 @@ extension Game {
                 // C - Choose one toon
                 let choosenToon: Toon = _fightStep_chooseToon(of: attackingPlayer)
                 // D - Engage in action
+                if Setting.ExtraWeapon.isActivated {
+                    switch mode {
+                    case .isVersusMachine:
+                        if Setting.ExtraWeapon.againstMachine == true { fallthrough }
+                    case .isVersusHuman:
+                        ExtraWeapon.extraWeaponAttempt(forToon: choosenToon)
+                    }
+                }
                 if let medicalToon = choosenToon as? MedicalToon { didMedicine = _fightStep_isDoctor(withToon: medicalToon)
                 } else { _fightStep_isElse(withToon: choosenToon) }
             }
             
-            // E - Report
-            
+            // E1 - Report
             if didMedicine {
                 let reportHeader = "Here is \(attackingPlayer.name)'s Team after medication ⛑ :"
                 _ = attackingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
@@ -246,6 +281,10 @@ extension Game {
                 let reportHeader = "Here is \(defendingPlayer.name)'s Team after this blow 🪖 :"
                 _ = defendingPlayer.listAllToons(aliveOnly: false, header: reportHeader, withBar: true)
             }
+            
+            // E2 - Extra report and other actions
+            ExtraWeapon.handleAfterFightExtraData(inGame: self)
+            
             // F - Prompt to continue
             let exitPrompt: Bool =  Console.getExitPrompt(exitWord: "exit")
             if exitPrompt == true { break }
@@ -289,7 +328,7 @@ extension Game {
             } else { pack[index].promptID = 0 }
         }
         // C - Call prompt and get result
-        Console.write(1, 1, """
+        Console.write(0, 1, """
             What do you want to do with \(doctor.getPicWithName()) ?
             \(promptText)
             """, 1)
@@ -313,7 +352,7 @@ extension Game {
                     promptText += "\(String(toon.promptID).withNum()). \(toon.getPicWithName()) with \(toon.getHitpointsAndPercent()) \n"
                 } else { toon.promptID = 0 }
             }
-            Console.write(1, 1, """
+            Console.write(0, 1, """
                 Who shall receive the \(singleUseMedicine.getPicWithName()) ?
                 \(promptText)
                 """, 0)
@@ -345,11 +384,11 @@ extension Game {
         let defender: Toon = defendingPlayer.toons.first(where: {$0.promptID == targetID})!
         // B - Fight
         let damage: Double = Weapon.getDamage(from: attacker, to: defender)
-        _fightStep_applyDamageAndStats(from: attacker, to: defender, of: Int(damage))
+        _fightStep_applyDamageSicknessAndStats(from: attacker, to: defender, of: Int(damage))
         _figthStep_Report(from: attacker, to: defender, of: Double(damage))
     }
     
-    private func _fightStep_applyDamageAndStats(from attacker: Toon, to defender: Toon, of damage: Int) {
+    private func _fightStep_applyDamageSicknessAndStats(from attacker: Toon, to defender: Toon, of damage: Int) {
         // A - Attacker
         attacker.statSet.roundPlayed += 1
         attacker.statSet.totalDamage.given += damage
@@ -362,6 +401,8 @@ extension Game {
         if damage > defender.statSet.bestDamage.received {
             defender.statSet.bestDamage.received = damage
         }
+        // C - Extra
+        ExtraWeapon.getToonSickIfRequired(from: attacker, to: defender)
     }
     private func _figthStep_Report(from attacker: Toon, to defender: Toon, of damage: Double) {
         let realDamage = damage
@@ -371,11 +412,11 @@ extension Game {
             (realDamage < (expectedDamage * 0.9)) ? (" scratched " , "causing only ", "🥉"):
             (realDamage < (expectedDamage * 1.1)) ? (" touched " , "amounting for ", "🥈") :
             (" punished " , "wrecking for ", "🥇")
-        let attackInfo: String = "ℹ️" + attacker.getPicWithName() + action + "" + defender.getPicWithName()
+        let attackInfo: String = "ℹ️. " + attacker.getPicWithName() + action + "" + defender.getPicWithName()
         let weaponInfo: String = "With " + attacker.getHisOrHer() + attacker.weapon!.getPicWithName()
         let resultInfo: String = result + String(Int(realDamage)) + " damages " + medal
         let message: String = attackInfo + "\n" + weaponInfo + " " + resultInfo
-        Console.write(1, 1, message, 1)
+        Console.write(0, 1, message, 1)
     }
     private func _fightStep_CanContinue() -> Bool {
         if defendingPlayer.toons.allSatisfy({ $0.lifeSet.hitpoints <= 0 }) {
@@ -388,7 +429,7 @@ extension Game {
         var didMedicine: Bool = false
         let action = machine.PlayWithIA(game: self)
         if let doAttack = action.attackCase {
-            Console.write(0, 1, "⚙️ \(attackingPlayer.name) made a choice and decided to attack :", 0)
+            Console.write(0, 1, "⚙️ \(attackingPlayer.name) made a choice and decided to attack :", 1)
             _fightStep_machineFight(withToon: doAttack.attacker, againt: doAttack.defender)
             return didMedicine
         } else {
@@ -396,7 +437,7 @@ extension Game {
                 Console.write(1, 1, "❌ An error occured and the game will quit now !", 0)
                 return didMedicine
             }
-            Console.write(0, 1, "⚙️ \(attackingPlayer.name) made a choice and decided to use medicine :", 0)
+            Console.write(0, 1, "⚙️ \(attackingPlayer.name) made a choice and decided to use medicine :", 1)
             let doctor: MedicalToon = machine.toons.first(where: { $0.self is MedicalToon }) as! MedicalToon
             let medicine = doMedicine.useMedicine ; let toon = doMedicine.onToon
             _fightStep_machineApplyMedicine(doctor: doctor, medicine: medicine, onToon: toon)
@@ -407,7 +448,7 @@ extension Game {
     
     private func _fightStep_machineFight(withToon attacker: Toon, againt defender: Toon) {
         let damage: Double = Weapon.getDamage(from: attacker, to: defender)
-        _fightStep_applyDamageAndStats(from: attacker, to: defender, of: Int(damage))
+        _fightStep_applyDamageSicknessAndStats(from: attacker, to: defender, of: Int(damage))
         _figthStep_Report(from: attacker, to: defender, of: Double(damage))
     }
     
@@ -477,8 +518,6 @@ extension Game {
         for toon in player.toons { global += toon.statSet.totalDamage.given + toon.statSet.medicine.received }
         return global
     }
-    
-    
     
     
     // MARK: G - END OF GAME
