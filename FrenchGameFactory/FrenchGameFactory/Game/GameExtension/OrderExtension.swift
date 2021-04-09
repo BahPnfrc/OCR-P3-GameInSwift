@@ -9,6 +9,7 @@ import Foundation
 
 extension Game {
     
+    // MARK: A - MAIN
     func orderStep(){
         Console.newSection()
         Console.write(0, 0, """

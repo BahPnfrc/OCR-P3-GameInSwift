@@ -12,14 +12,16 @@ final class Setting {
     private static let useDefault: Bool = true
     
     final class Game {
+        
         static var fastPlayEnabled: Bool = false
         static let fastPlayLevel: Level
             = useDefault ? .isHard : .isHard
         static let fastPlayOrder: Order
-            = useDefault ? .first : .chance
+            = useDefault ? .chance : .second
     }
 
     final class Toon {
+        
         static let defaultLifeSet: (hitpoints: Int, isSick: Bool)
             = useDefault ? (1000, false) : (1000, false)
         static let defaultSkillSet: Double
@@ -62,6 +64,7 @@ final class Setting {
     }
     
     final class ExtraWeapon {
+        
         static let isActivated: Bool =
             useDefault ? true : true
         static let againstMachine: Bool =

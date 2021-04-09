@@ -15,7 +15,7 @@ extension Game {
         var round: Int = 0
         var turn: [String] = ["🅰️","🅱️"]
         
-        // MARK: A - WORKFLOW
+        // MARK: A - MAIN
         repeat {
             
             counter += 1

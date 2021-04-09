@@ -9,6 +9,7 @@ import Foundation
 
 extension Game {
     
+    // MARK: A - MAIN
     func statStep() {
         
         // A - Global HP given + restored score
@@ -39,6 +40,7 @@ extension Game {
         
     }
     
+    // MARK: B - RESULT
     private func _statStep_AverageScore(OfPlayer player: Player) -> Int {
         var global:Int = 0
         for toon in player.toons { global += toon.statSet.totalDamage.given + toon.statSet.medicine.received }
@@ -60,13 +62,14 @@ extension Game {
         //let totalScore: Int = player.main.finalScore + player.second.finalScore
         //let winnerBar: String = _statStep_getBar(with: result.winner.finalScore, outOf: totalScore, legend: "total")
         //let loserBar: String = _statStep_getBar(with: result.loser.finalScore, outOf: totalScore, legend: "total")
-        Console.write(1, 0, "➡️ Round #️⃣\(roundPlayed)✅ : 🔔 *Ding Ding* We have a champion 🏆 !" .withNum(),0)
+        Console.write(1, 0, "⏹ Round #️⃣\(roundPlayed)✅ : 🔔 *Ding Ding* We have a champion 🏆 !" .withNum(),0)
         Console.write(1, 1, """
             🏁 Winner : \(winner.name) with \(winner.finalScore) HP Taken + Healed
             🏳️ Loser : \(loser.name) with \(loser.finalScore) HP Taken + Healed
             """, 0)
     }
     
+    // MARK: C - AWARDS
     private func _statStep_survivorAwards(withToons allToons: [Toon]) {
         // Survivor award
         let Medals: [String] = ["🥇", "🥈", "🥉"]
@@ -105,6 +108,7 @@ extension Game {
             """, 0)
     }
     
+    // MARK: D - TOOLS
     private func _statStep_getBestDamageRank(
             withToons toons: [Toon], withMaxIndex maxIndex: Int,
             withHeader header: String, withType type: String) -> String {

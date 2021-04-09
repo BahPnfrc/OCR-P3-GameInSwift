@@ -9,6 +9,7 @@ import Foundation
 
 extension Game {
     
+    // MARK: A - MAIN
     func chooseStep(){
         
         let firstToChoose: Player = queue[0]
@@ -34,10 +35,10 @@ extension Game {
                 _chooseStep_machineChoose(forPlayer: secondToChose)
                 _chooseStep_machineReportChoose(forPlayer: secondToChose, as: .second)
             }
-            
         }
     }
     
+    // MARK: B - HUMAN ACTIONS
     private func _chooseStep_humanChoose(forPlayer human: Player, withHeader header: String? = nil){
         
         let defaultHeader: String = """
@@ -97,6 +98,7 @@ extension Game {
         }
     }
     
+    // MARK: C - MACHINE ACTIONS
     private func _chooseStep_machineChoose(forPlayer machine: Player) {
         var results: [(ID: Int, globalSet: Double)] = []
         let toonClasses = [EngineerToon.All, MilitaryToon.All, MedicalToon.All]
