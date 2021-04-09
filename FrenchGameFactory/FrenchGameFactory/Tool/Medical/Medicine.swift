@@ -33,16 +33,6 @@ class Medicine : Tool {
             withName: name)
     }
     
-    func restoreHitpointsWithStats(ofToon toon: Toon, to expectedHitpoints: Int) -> Int {
-        let currentHitpoints: Int = toon.lifeSet.hitpoints
-        if currentHitpoints < expectedHitpoints {
-            let restoredHitpoints: Int = expectedHitpoints - currentHitpoints
-            toon.statSet.medicine.received += restoredHitpoints // #STAT
-            toon.lifeSet.hitpoints += restoredHitpoints
-            return restoredHitpoints
-        } else { return 0 }
-    }
-    
     static func getMedicalPack() -> [Medicine] {
         
         let light: SingleUseMedicine = SingleUseMedicine(

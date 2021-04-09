@@ -12,11 +12,11 @@ final class Setting {
     private static let useDefault: Bool = true
     
     final class Game {
-        static var fastPlayEnabled: Bool = false // Dynamic
+        static var fastPlayEnabled: Bool = false
         static let fastPlayLevel: Level
-            = useDefault ? .isMedium : .isHard
+            = useDefault ? .isHard : .isHard
         static let fastPlayOrder: Order
-            = useDefault ? .second : .chance
+            = useDefault ? .first : .chance
     }
 
     final class Toon {

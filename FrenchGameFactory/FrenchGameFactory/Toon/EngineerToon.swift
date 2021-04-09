@@ -53,7 +53,7 @@ final class EngineerToon: Toon {
                 case (.isAdult, .isWoman):
                     toon = ("👩‍💻", "Apple Coder") ; weapon = ("🖥", "iMac Pro")
                 case (.isSenior, .isMan):
-                    toon = ("👨‍💼", "Emeritus Pr.") ; weapon = ("📡", "Parabellum Parrabolla")
+                    toon = ("👨‍💼", "Emeritus Pr.") ; weapon = ("📡", "Parabellum Parabolla")
                 case (.isSenior, .isWoman):
                     toon = ("👩‍💼", "Emeritus Pr.") ; weapon = ("🦾", "Bionic Beef")
             }

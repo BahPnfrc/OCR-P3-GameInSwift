@@ -47,7 +47,7 @@ final class MedicalToon: Toon {
             for gender in Gender.allCases {
                 switch (age, gender) {
                 case (.isJunior, .isMan):
-                    toon = ("👨‍🎓", "Post Graduate") ; weapon = ("💉", "Stiring Syringe")
+                    toon = ("👨‍🎓", "Post Graduate") ; weapon = ("💉", "Stirring Syringe")
                 case (.isJunior, .isWoman):
                     toon = ("👩‍🎓", "Post Graduate") ; weapon = ("🍿", "Poisoned Popcorn")
                 case (.isAdult, .isMan):

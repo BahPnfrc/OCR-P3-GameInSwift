@@ -15,3 +15,4 @@ MilitaryToon.createAll()
 // Run the game
 let game = Game()
 game.run()
+

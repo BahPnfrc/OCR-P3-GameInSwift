@@ -29,8 +29,8 @@ final class ExtraWeapon: Weapon {
         case .isMalus:
             (damageSet.biologic.updated,
              damageSet.kinetic.updated,
-             damageSet.thermic.updated) =
-                Setting.ExtraWeapon.updatedDamageSetwithMalus
+             damageSet.thermic.updated)
+                = Setting.ExtraWeapon.updatedDamageSetwithMalus
         }
     }
     
@@ -63,15 +63,15 @@ final class ExtraWeapon: Weapon {
         return
     }
     
-    static func getToonSickIfRequired(from attacker: Toon, to defender: Toon) {
+    static func spreadVirus(from attacker: Toon, to defender: Toon) {
         guard let extraWeapon = attacker.weapon! as? ExtraWeapon else { return }
         if extraWeapon.type == .isBonusDisease { defender.lifeSet.isSick = true }
     }
     
     static func handleAfterFightExtraData(inGame game: Game) {
         let previousWeaponText: String? = _getPreviousWeapon()
-        let sicknessText: String? = _applySicknessOnEachRound(inGame: game)
-        switch (previousWeaponText, sicknessText) {
+        let virusText: String? = _applyVirusOnEachRound(inGame: game)
+        switch (previousWeaponText, virusText) {
         case let (.some(weapon), .some(sickness)):
             Console.write(0, 2, weapon + sickness, 0)
         case let (.some(weapon), .none):
@@ -92,16 +92,15 @@ final class ExtraWeapon: Weapon {
         _weaponSaver.removeAll()
         return previousWeaponText.count > 0 ? previousWeaponText : nil
     }
-    private static func _applySicknessOnEachRound(inGame game: Game) -> String? {
+    private static func _applyVirusOnEachRound(inGame game: Game) -> String? {
         let players: [Player] = [game.attackingPlayer, game.defendingPlayer]
         var sicknessText: String = ""
         for player in players {
             for toon in player.toons {
-                if toon.isAlive() && toon.lifeSet.isSick {
-                    let toonHitpoints: Int = toon.lifeSet.hitpoints
+                if toon.isAlive() && toon.isSick() {
+                    let toonHitpoints: Int = toon.getHitPointsLeft()
                     let damage: Int = Int(Double(toonHitpoints) * sickMultiplicator)
-                    toon.lifeSet.hitpoints -= Int(damage)
-                    toon.statSet.totalDamage.received += Int(damage)
+                    toon.loseHP(from: nil, for: damage)
                     sicknessText += "ℹ️. \(toon.getPicWithName()) is sick and just lost \(damage) HP to \(toon.getPercentLeft())%\n"
                 }
             }
@@ -118,7 +117,7 @@ final class ExtraWeapon: Weapon {
         let newWeapon: ExtraWeapon = toon.weapon as! ExtraWeapon
         let help: String = newWeapon.type == .isBonusDisease ?
             "The \(toon.weapon!.getPicWithName()) takes \(sickPercentPenalty)% HP each round until medicine is given 👍" :
-            "This \(toon.weapon!.getPicWithName()) lost its venomoussness since last fullmoon 👎"
+            "This \(toon.weapon!.getPicWithName()) lost its venomousness since last fullmoon 👎"
         Console.write(0, 1, "\(message)\n\(help)", 1)
     }
     private static func _getRandomWeapon() -> ExtraWeapon {

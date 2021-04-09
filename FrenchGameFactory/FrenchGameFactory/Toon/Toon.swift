@@ -15,8 +15,6 @@ protocol LifeSet {
         {get set}
 }
 extension LifeSet {
-    mutating func takeHit(for amount: Int){ lifeSet.hitpoints -= amount}
-    mutating func receiveMedicine(for amount: Int){lifeSet.hitpoints += amount}
     func getHitPointsLeft() -> Int {return lifeSet.hitpoints}
     func getPercentLeft() -> Int {
         let actuelDouble: Double = Double(getHitPointsLeft())
@@ -26,6 +24,7 @@ extension LifeSet {
         return Int(result)
     }
     func isAlive() -> Bool {return lifeSet.hitpoints > 0}
+    func isSick() -> Bool {return lifeSet.isSick}
 }
 
 // MARK: Protocol : SkillSet
@@ -70,6 +69,7 @@ extension FightSet {
 protocol StatSet {
     var statSet: (
         roundPlayed: Int,
+        sicknessDamage: Int,
         totalDamage: (received: Int, given: Int),
         bestDamage: (received: Int, given: Int),
         medicine: (received: Int, given: Int)
@@ -138,15 +138,15 @@ class Toon: LifeSet, SkillSet, FightSet, StatSet {
     
     // MARK: StatSet
     var statSet:
-        (roundPlayed: Int,
+        (roundPlayed: Int, sicknessDamage: Int,
          totalDamage: (received: Int, given: Int),
          bestDamage: (received: Int, given: Int),
          medicine: (received: Int, given: Int))
-        = (0,
+        = (0, 0,
            (0, 0),
            (0, 0),
            (0, 0))
-     
+    
     // MARK: Init
     init(
         withID id: Int,
@@ -183,6 +183,40 @@ class Toon: LifeSet, SkillSet, FightSet, StatSet {
         }
     }
 }
+// MARK: Hitpoints
+extension Toon {
+   
+    func loseHP(from attacker: Toon?, for amount: Int){
+        // A - Defender
+        lifeSet.hitpoints -= amount
+        statSet.totalDamage.received += amount
+        if amount > statSet.bestDamage.received {
+            statSet.bestDamage.received = amount
+        }
+        // B - Attacker
+        guard let attacker = attacker else {
+            statSet.sicknessDamage += amount
+            return
+        }
+        attacker.statSet.roundPlayed += 1
+        attacker.statSet.totalDamage.given += amount
+        if amount > attacker.statSet.bestDamage.given {
+            attacker.statSet.bestDamage.given = amount
+        }
+        // C - Sickness check
+        if !isSick() {
+            ExtraWeapon.spreadVirus(from: attacker, to: self)
+        }
+    }
+    func gainHP(from medical: MedicalToon, for amount: Int){
+        // Defender
+        lifeSet.hitpoints += amount
+        statSet.medicine.received += amount
+        // Doctor
+        medical.statSet.medicine.given += amount
+    }
+}
+
 // MARK: Extension : Random Name
 extension Toon {
    
@@ -190,14 +224,14 @@ extension Toon {
         ["Zenon", "Danton", "Gatien", "Zephir", "Clodomir",
         "Petrus", "Lazare", "Flavien", "Ovide", "Medard"]
     
-    private static var defaultnameForWoman: [String] =
+    private static var defaultNameForWoman: [String] =
         ["Evodie", "Rejane", "Vitaline", "Nonce", "Toussine",
          "Firmine", "Peroline", "Gratienne", "Renelle", "Zilda"]
     
     func getRandomName() -> String {
         var randomName: String
         var rightArray = self.gender == .isMan ?
-            Toon.defaultNameForMan : Toon.defaultnameForWoman
+            Toon.defaultNameForMan : Toon.defaultNameForWoman
         rightArray.shuffle()
         randomName = rightArray.first!
         rightArray.removeFirst()
@@ -206,7 +240,7 @@ extension Toon {
     static func getStaticRandomName(forToon toon: Toon) -> String {
         var randomName: String
         var rightArray = toon.gender == .isMan ?
-            Toon.defaultNameForMan : Toon.defaultnameForWoman
+            Toon.defaultNameForMan : Toon.defaultNameForWoman
         rightArray.shuffle()
         randomName = rightArray.first!
         rightArray.removeFirst()
@@ -277,9 +311,9 @@ extension Toon {
             if percentLeft > step.percent {
                 var coloredBlockNumber: Int = percentLeft * barLenght / 100
                 if coloredBlockNumber == 0 { coloredBlockNumber = 1 } //
-                let blanckBlockNumber: Int = barLenght - coloredBlockNumber
+                let blankBlockNumber: Int = barLenght - coloredBlockNumber
                 lifeBar.append(String(repeating: step.block, count: coloredBlockNumber))
-                lifeBar.append(String(repeating: "⬜️", count: blanckBlockNumber))
+                lifeBar.append(String(repeating: "⬜️", count: blankBlockNumber))
                 return lifeBar + percentAsString
             }
         }

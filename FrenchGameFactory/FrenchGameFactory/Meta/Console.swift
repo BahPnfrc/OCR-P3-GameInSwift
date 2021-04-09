@@ -31,8 +31,10 @@ class Console {
         if lineAfter > 0 { print(String(repeating: "\t", count: lineAfter))}
     }
     
-    static func writeError(_ message: String) {
-        fputs("[Error] " + message + "\n", stderr) // Uses the C function
+    static func writeError(atLine: Int, inFunc: String) {
+        Console.write(1, 1, "❌ Guard failed at lign \(atLine) in \(inFunc)",0)
+        Console.getBreakPrompt(tab: 1)
+        Console.emptyLine()
     }
     
     static func newSection(lines:Int = 2){
@@ -132,12 +134,12 @@ class Console {
         } while true
     }
     static func getExitPrompt(exitWord:String) -> Bool {
-        Console.write(0, 0, "➡️ Type '\(exitWord)' to exit ❎ or press 'Enter' to continue ✅", 0)
+        Console.write(0, 0, "⏸ Type '\(exitWord)' to exit ❎ or press 'Enter' to continue ✅", 0)
         guard let typedText = readLine() else { return false }
         return typedText == exitWord
     }
-    static func getSimplePrompt() {
-        Console.write(0, 0, "➡️ Press 'Enter' to continue ✅", 0)
+    static func getBreakPrompt(tab: Int = 2) {
+        Console.write(0, tab, "⏸ Press 'Enter' to continue ✅", 0)
         _ = readLine()
     }
 }
