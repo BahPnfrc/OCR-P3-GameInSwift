@@ -10,7 +10,7 @@ import Foundation
 extension Game {
     
     func fightStep() {
-        Toon.resetAllPromptID()
+        
         var counter: Int = 0
         var round: Int = 0
         var turn: [String] = ["🅰️","🅱️"]
@@ -78,7 +78,7 @@ extension Game {
     // MARK: B - MISCELLANEOUS
     private func _fightStep_chooseToon(of player: Player) -> Toon {
         while true {
-            let promptForNumber = Console.getIntInput(fromTo: 1...player.toons.count)
+            let promptForNumber = Console.getIntInput(fromTo: 1...player.toons.count, withHelp: true)
             let choosenToon = player.toons.first(where: { $0.promptID == promptForNumber })!
             if !choosenToon.isAlive() {
                 Console.write(1, 1, choosenToon.getPicWithName() + " can't fight : \(choosenToon.getHeOrShe())is knocked out !", 1)
@@ -171,7 +171,7 @@ extension Game {
             Who shall suffer the wrath of \(attacker.getPicWithName()) ?
             \(promptText)
             """, 0)
-        let targetID: Int = Console.getIntInput(fromTo: 1...maxPromptID)
+        let targetID: Int = Console.getIntInput(fromTo: 1...maxPromptID, withHelp: true)
         let defender: Toon = defendingPlayer.toons.first(where: {$0.promptID == targetID})!
         // B - Fight
         let damage: Double = Weapon.getDamage(from: attacker, to: defender)

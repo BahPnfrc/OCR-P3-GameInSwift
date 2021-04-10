@@ -29,6 +29,7 @@ final class MilitaryToon: Toon {
             withTitle: title)
         
         // Malus = Biologic, Bonus = Thermic
+        // Malus = c/ Medical, Bonus = c/ Engineer
         self.fightSet.biologic.defense *= ToonModifier.malus()
         self.fightSet.biologic.attack *= ToonModifier.malus()
         self.fightSet.kinetic.defense *= ToonModifier.same()

@@ -1,5 +1,5 @@
 //
-//  Human.swift
+//  HumanPlayer.swift
 //  FrenchGameFactory
 //
 //  Created by Pierre-Alexandre on 22/03/2021.

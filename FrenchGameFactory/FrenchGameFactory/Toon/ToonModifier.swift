@@ -1,5 +1,5 @@
 //
-//  Modifier.swift
+//  ToonModifier.swift
 //  FrenchGameFactory
 //
 //  Created by Pierre-Alexandre on 13/03/2021.

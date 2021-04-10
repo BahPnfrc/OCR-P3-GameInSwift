@@ -29,6 +29,7 @@ final class EngineerToon: Toon {
             withTitle: title)
         
         // Malus = Thermic, Bonus = Kinetic
+        // Malus = c/ Militaire, Bonus = c/ Medical
         self.fightSet.biologic.defense *= ToonModifier.same()
         self.fightSet.biologic.attack *= ToonModifier.same()
         self.fightSet.kinetic.defense *= ToonModifier.bonus()
@@ -45,7 +46,7 @@ final class EngineerToon: Toon {
             for gender in Gender.allCases {
                 switch (age, gender) {
                 case (.isJunior, .isMan):
-                    toon = ("👨‍🔧", "Young Meccano") ; weapon = ("🔧", "BloodStench Wrench")
+                    toon = ("👨‍🔧", "Young Meccano") ; weapon = ("🔧", "OilStench Wrench")
                 case (.isJunior, .isWoman):
                     toon = ("👩‍🔧", "Young Meccano") ; weapon = ("🔩", "ChewThrough Screw")
                 case (.isAdult, .isMan):
@@ -53,7 +54,7 @@ final class EngineerToon: Toon {
                 case (.isAdult, .isWoman):
                     toon = ("👩‍💻", "Apple Coder") ; weapon = ("🖥", "iMac Pro")
                 case (.isSenior, .isMan):
-                    toon = ("👨‍💼", "Emeritus Pr.") ; weapon = ("📡", "Parabellum Parabolla")
+                    toon = ("👨‍💼", "Emeritus Pr.") ; weapon = ("📡", "Parabellum Parabola")
                 case (.isSenior, .isWoman):
                     toon = ("👩‍💼", "Emeritus Pr.") ; weapon = ("🦾", "Bionic Beef")
             }

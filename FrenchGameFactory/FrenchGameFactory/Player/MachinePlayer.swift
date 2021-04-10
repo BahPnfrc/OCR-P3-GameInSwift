@@ -1,5 +1,5 @@
 //
-//  Machine.swift
+//  MachinePlayer.swift
 //  FrenchGameFactory
 //
 //  Created by Pierre-Alexandre on 22/03/2021.

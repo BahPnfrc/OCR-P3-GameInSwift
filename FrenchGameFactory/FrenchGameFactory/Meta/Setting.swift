@@ -1,5 +1,5 @@
 //
-//  Settings.swift
+//  Setting.swift
 //  FrenchGameFactory
 //
 //  Created by Pierre-Alexandre on 12/03/2021.
@@ -70,7 +70,7 @@ final class Setting {
         static let againstMachine: Bool =
             useDefault ? true : true
         static let isForcedOnEachRound: Bool =
-            useDefault ? false : true
+            useDefault ? false : false
         static let isMultipleOf: Int =
             useDefault ? 3 : 3
         

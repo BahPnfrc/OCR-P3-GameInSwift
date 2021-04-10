@@ -36,6 +36,7 @@ extension Game {
         
         // D - Give awards
         _statStep_survivorAwards(withToons: allToons)
+        Console.getBreakPrompt()
         _statStep_otherAwards(withToons: allToons)
         
     }
@@ -90,22 +91,28 @@ extension Game {
         
         let hitmanAward: String = _statStep_getRank(
             withToons: hitmanNominated, withMaxIndex: 2, withType: "Taken",
-            rankCheck: { (toons: [Toon]) -> Bool in return toons.allSatisfy({ $0.statSet.bestDamage.given == 0 }) },
-            rankValue: { (toon: Toon) -> Int in return toon.statSet.bestDamage.given })
+            rankCheckClosure: { (toons: [Toon]) -> Bool in return toons.allSatisfy({ $0.statSet.bestDamage.given == 0 }) },
+            rankValueClosure: { (toon: Toon) -> Int in return toon.statSet.bestDamage.given })
         let berserkerAward: String = _statStep_getRank(
             withToons: berserkerNominated, withMaxIndex: 2, withType: "Taken",
-            rankCheck: { (toons: [Toon]) -> Bool in return toons.allSatisfy({ $0.statSet.totalDamage.given == 0 }) },
-            rankValue: { (toon: Toon) -> Int in return toon.statSet.totalDamage.given })
+            rankCheckClosure: { (toons: [Toon]) -> Bool in return toons.allSatisfy({ $0.statSet.totalDamage.given == 0 }) },
+            rankValueClosure: { (toon: Toon) -> Int in return toon.statSet.totalDamage.given })
         let doctorAward: String = _statStep_getRank(
             withToons: doctorNominated, withMaxIndex: 1, withType: "Healed",
-            rankCheck: { (toons: [Toon]) -> Bool in return toons.allSatisfy({ $0.statSet.medicine.given == 0 }) },
-            rankValue: { (toon: Toon) -> Int in return toon.statSet.medicine.given })
+            rankCheckClosure: { (toons: [Toon]) -> Bool in return toons.allSatisfy({ $0.statSet.medicine.given == 0 }) },
+            rankValueClosure: { (toon: Toon) -> Int in return toon.statSet.medicine.given })
         
         Console.write(0, 1, """
             2️⃣. Hitman ✨award✨ 🎯 :
             \(hitmanAward)
+            """, 0)
+        Console.getBreakPrompt()
+        Console.write(0, 1, """
             3️⃣. Berserker ✨award✨ ⚔️ :
             \(berserkerAward)
+            """, 0)
+        Console.getBreakPrompt()
+        Console.write(0, 1, """
             4️⃣. Doctor ✨award✨ 🌡 :
             \(doctorAward)
             """, 0)
@@ -114,11 +121,11 @@ extension Game {
     // MARK: D - TOOLS
     private func _statStep_getRank(
             withToons toons: [Toon], withMaxIndex maxIndex: Int, withType type: String,
-            rankCheck noRankCheck: ([Toon]) -> Bool,
-            rankValue getRankValue: (Toon) -> Int
+            rankCheckClosure getRankCheck: ([Toon]) -> Bool,
+            rankValueClosure getRankValue: (Toon) -> Int
             ) -> String {
         var result: String = ""
-        if noRankCheck(toons) == true {
+        if getRankCheck(toons) == true {
             return "- No toon was ranked\n"
         } else { for index in 0...maxIndex {
             guard maxIndex <= (Game.Medals.count - 1) else { break }

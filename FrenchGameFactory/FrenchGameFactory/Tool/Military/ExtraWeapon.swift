@@ -1,5 +1,5 @@
 //
-//  BonusWeapon.swift
+//  ExtraWeapon.swift
 //  FrenchGameFactory
 //
 //  Created by Pierre-Alexandre on 05/04/2021.

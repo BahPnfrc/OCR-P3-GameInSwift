@@ -1,5 +1,5 @@
 //
-//  MachineExtension.swift
+//  PlayExtension.swift
 //  FrenchGameFactory
 //
 //  Created by Pierre-Alexandre on 09/04/2021.

@@ -1,5 +1,5 @@
 //
-//  ConsoleIO.swift
+//  Console.swift
 //  FrenchGameFactory
 //
 //  Created by Pierre-Alexandre on 02/03/2021.
@@ -78,23 +78,32 @@ class Console {
     // MARK: Int input
     private static func promptForIntInput(_ range: ClosedRange<Int>) {
         Console.write(0, 0,
-        "➡️ Type a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' to continue ✅".withNum(),
+        "➡️ Type a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' ✅".withNum(),
         0)
     }
-    static func getIntInput(fromTo range: ClosedRange<Int>) -> Int {
+    private static func promptForIntInputWithHelp(_ range: ClosedRange<Int>) {
+        Console.write(0, 0,
+        "➡️ Type 'help' ✳️ or a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' ✅".withNum(),
+        0)
+    }
+    static func getIntInput(fromTo range: ClosedRange<Int>, withHelp: Bool = false) -> Int {
         repeat {
-            promptForIntInput(range)
+            if withHelp { promptForIntInputWithHelp(range) }
+            else { promptForIntInput(range) }
             do {
                 let rawInput = try getRawInput()
-                guard let intInput: Int = Int(rawInput) else {
-                    Console.write(0, 1, "⚠️ Expected number was not found : \(randomError) ⚠️", 1)
-                    continue
+                if withHelp && rawInput == "help" { _showHelp()
+                } else {
+                    guard let intInput: Int = Int(rawInput) else {
+                        Console.write(0, 1, "⚠️ Expected number was not found : \(randomError) ⚠️", 1)
+                        continue
+                    }
+                    guard range.contains(intInput) else {
+                        Console.write(0, 1, "⚠️ \(intInput) is not expected : \(randomError) ⚠️", 1)
+                        continue
+                    }
+                    return intInput
                 }
-                guard range.contains(intInput) else {
-                    Console.write(0, 1, "⚠️ \(intInput) is not expected : \(randomError) ⚠️", 1)
-                    continue
-                }
-                return intInput
             } catch {
                 Console.write(0,1, "⚠️ No input was found : \(randomError) ⚠️", 1)
                 continue
@@ -104,7 +113,7 @@ class Console {
     
     // MARK: String input
     private static func promptForStringInput(_ required: String) {
-        Console.write(0, 0, "➡️ Type \(required) and press 'Enter' to continue ✅", 0)
+        Console.write(0, 0, "➡️ Type \(required) and press 'Enter' ✅", 0)
     }
     private static func contentCheck(content string: String, check charactereSet: CharacterSet) -> Bool {
         let range = string.rangeOfCharacter(from: charactereSet)
@@ -134,10 +143,17 @@ class Console {
         } while true
     }
     static func getExitPrompt(exitWord:String) -> Bool {
-        Console.write(0, 0, "⏸ Type '\(exitWord)' to exit ❎ or press 'Enter' to continue ✅", 0)
-        guard let typedText = readLine() else { return false }
-        return typedText == exitWord
+        while true {
+            Console.write(0, 0, "⏸ Type '\(exitWord)' ❎ or press 'Enter' to continue ✅", 0)
+            guard let typedText = readLine() else { return false }
+            return typedText == exitWord
+        }
     }
+    
+    private static func _showHelp(enabled: Bool = true) {
+        if enabled { Console.write(1, 1, Toon.help, 1)}
+    }
+    
     static func getBreakPrompt(tab: Int = 0) {
         Console.write(0, tab, "⏸ Press 'Enter' to continue ✅", 0)
         _ = readLine()

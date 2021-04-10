@@ -19,12 +19,13 @@ extension LifeSet {
     func getPercentLeft() -> Int {
         let actuelDouble: Double = Double(getHitPointsLeft())
         let totalDouble: Double = Double(Setting.Toon.defaultLifeSet.hitpoints)
-        let result = actuelDouble * 100 / totalDouble
+        let result: Double = actuelDouble * 100 / totalDouble
         if result < 1 { return 0}
         return Int(result)
     }
     func isAlive() -> Bool {return lifeSet.hitpoints > 0}
     func isSick() -> Bool {return lifeSet.isSick}
+    
 }
 
 // MARK: Protocol : SkillSet
@@ -66,6 +67,7 @@ extension FightSet {
     func getGlobalFightSet() -> Double {return getAverageFightAttack() * getAverageFightDefense()}
 }
 
+// MARK: Protocol : StatSet
 protocol StatSet {
     var statSet: (
         roundPlayed: Int,
@@ -77,12 +79,8 @@ protocol StatSet {
 }
 
 // MARK: Enumations
-enum Gender: String, CaseIterable {
-    case isMan = "man", isWoman = "woman"
-}
-enum Age: String, CaseIterable {
-    case isJunior = "mid 30'", isAdult = "mid 40'", isSenior = "mid 50'"
-}
+enum Gender: String, CaseIterable { case isMan = "man", isWoman = "woman" }
+enum Age: String, CaseIterable { case isJunior = "mid 30'", isAdult = "mid 40'", isSenior = "mid 50'" }
 
 // MARK: Class
 class Toon: LifeSet, SkillSet, FightSet, StatSet {
@@ -107,14 +105,10 @@ class Toon: LifeSet, SkillSet, FightSet, StatSet {
     
     // MARK: SkillSet
     var skillSet: (
-        strenght: Double,
-        accuracy: Double,
-        agility: Double,
-        forsight: Double)
-        = (Setting.Toon.defaultSkillSet,
-           Setting.Toon.defaultSkillSet,
-           Setting.Toon.defaultSkillSet,
-           Setting.Toon.defaultSkillSet)
+        strenght: Double, accuracy: Double,
+        agility: Double, forsight: Double)
+        = (Setting.Toon.defaultSkillSet, Setting.Toon.defaultSkillSet,
+           Setting.Toon.defaultSkillSet, Setting.Toon.defaultSkillSet)
     
     lazy var averageSkillAttack: Double = getAverageSkillAttack()
     lazy var averageSkillDefense: Double = getAverageSkillDefense()
@@ -182,10 +176,7 @@ class Toon: LifeSet, SkillSet, FightSet, StatSet {
             }
         }
     }
-}
-// MARK: Hitpoints
-extension Toon {
-   
+    
     func loseHP(from attacker: Toon?, for amount: Int){
         // A - Defender
         lifeSet.hitpoints -= amount
@@ -215,109 +206,12 @@ extension Toon {
         // Doctor
         medical.statSet.medicine.given += amount
     }
+    
+    static let help: String = """
+    ✳️. Help was requested :
+    1. Engineer is usually strong 🆚📈 Medical but weak 🆚📉 Military
+    2. Military is usually strong 🆚📈 Engineer but weak 🆚📉 Medical
+    3. Medical is usually strong 🆚📈 Military but weak 🆚📉 Engineer
+    """.withNum()
 }
 
-// MARK: Extension : Random Name
-extension Toon {
-   
-    private static var defaultNameForMan: [String] =
-        ["Zenon", "Danton", "Gatien", "Zephir", "Clodomir",
-        "Petrus", "Lazare", "Flavien", "Ovide", "Medard"]
-    
-    private static var defaultNameForWoman: [String] =
-        ["Evodie", "Rejane", "Vitaline", "Nonce", "Toussine",
-         "Firmine", "Peroline", "Gratienne", "Renelle", "Zilda"]
-    
-    func getRandomName() -> String {
-        var randomName: String
-        var rightArray = self.gender == .isMan ?
-            Toon.defaultNameForMan : Toon.defaultNameForWoman
-        rightArray.shuffle()
-        randomName = rightArray.first!
-        rightArray.removeFirst()
-        return randomName
-    }
-    static func getStaticRandomName(forToon toon: Toon) -> String {
-        var randomName: String
-        var rightArray = toon.gender == .isMan ?
-            Toon.defaultNameForMan : Toon.defaultNameForWoman
-        rightArray.shuffle()
-        randomName = rightArray.first!
-        rightArray.removeFirst()
-        return randomName
-    }
-}
-// MARK: Extension : Retrieve data
-extension Toon {
-    
-    static func resetAllPromptID() {
-        for toon in EngineerToon.All { toon.promptID = 0 }
-        for toon in MilitaryToon.All { toon.promptID = 0 }
-        for toon in MedicalToon.All { toon.promptID = 0 }
-    }
-    
-    func getHeOrShe(withMaj:Bool = false) -> String {
-        gender == .isMan ?
-            (withMaj == true ? "He " : "he ") :
-            (withMaj == true ? "She " : "she ")
-    }
-    func getHisOrHer(withMaj:Bool = false) -> String {
-        gender == .isMan ?
-            (withMaj == true ? "His " : "his ") :
-            (withMaj == true ? "Her " : "her ")
-    }
-    func getAgeWithGender() -> String {
-        age.rawValue + " " + gender.rawValue
-    }
-    func getPicWithName() -> String {
-        var pic = self.pic
-        if !isAlive() { pic = "❌" + pic }
-        else if self.lifeSet.isSick == true { pic = "🦠" + pic }
-        guard let name = name else { return  pic + " " + title }
-        return pic + " " + title + " " + name
-    }
-    func getChooseToonPrompt() -> String {
-        let name: String = String(promptID) + ". " +  getPicWithName() + " " + gender.rawValue
-        let age: String = "a " + self.age.rawValue
-        let tool: String = "with " + getHisOrHer() + weapon!.getPicWithName()
-        return name + " : " + age + " " + tool
-    }
-    func getFightPrompt() -> String {
-        let name : String = String(promptID).withNum() + ". " + getPicWithName()
-        let tool : String = weapon!.getPicWithName()
-        return name + " with " + getHisOrHer() + tool
-    }
-    
-    func getFightPromptWithBar() -> String {
-        return getFightPrompt() + "\n" + getLifeBar() + "\n"
-    }
-    
-    func getHitpointsAndPercent() -> String {
-        return "\(self.lifeSet.hitpoints) HP left : \(getPercentLeft())%"
-    }
-    
-    func getLifeBar(withBlocks blocks: Int = 28) -> String {
-        // A - Percent as a string
-        let percentLeft: Int = self.getPercentLeft()
-        var percentText: String = String(percentLeft)
-        if percentLeft == 0 && self.isAlive() { percentText = "≈0"}
-        let percentAsString = " " + percentText + "%"
-        // B - Percent as a picture
-        let barLenght: Int = blocks
-        let model: [(percent: Int, block: String)] =
-        [(60, "🟩"), (40, "🟨"), (20, "🟧"),(0, "🟥")]
-        var lifeBar: String = ""
-        for step in model {
-            if percentLeft > step.percent {
-                var coloredBlockNumber: Int = percentLeft * barLenght / 100
-                if coloredBlockNumber == 0 { coloredBlockNumber = 1 } //
-                let blankBlockNumber: Int = barLenght - coloredBlockNumber
-                lifeBar.append(String(repeating: step.block, count: coloredBlockNumber))
-                lifeBar.append(String(repeating: "⬜️", count: blankBlockNumber))
-                return lifeBar + percentAsString
-            }
-        }
-        lifeBar.append(String(repeating: "⬜️", count: barLenght))
-        return lifeBar + percentAsString
-    }
-}

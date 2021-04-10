@@ -103,7 +103,7 @@ class Game {
     }
     
     func quit() {
-        Console.write(1, 1, "✨🦠✨ END OF THE GAME ✨🍄✨", 1)
+        Console.write(1, 1, "✨🦠✨ END OF THE GAME ✨🍄✨", 2)
     }
     
 }

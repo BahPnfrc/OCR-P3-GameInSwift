@@ -1,5 +1,5 @@
 //
-//  DmgProfil.swift
+//  DamageCase.swift
 //  FrenchGameFactory
 //
 //  Created by Pierre-Alexandre on 30/03/2021.

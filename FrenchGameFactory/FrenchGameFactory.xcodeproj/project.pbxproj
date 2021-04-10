@@ -29,6 +29,7 @@
 		0B296D3626089163006AA880 /* ThermicWeapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D3526089163006AA880 /* ThermicWeapon.swift */; };
 		0B296D3F2608EC0D006AA880 /* HumanPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D3E2608EC0D006AA880 /* HumanPlayer.swift */; };
 		0B296D432608EC18006AA880 /* MachinePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B296D422608EC18006AA880 /* MachinePlayer.swift */; };
+		0B83EC212621BE32008577F9 /* ToonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B83EC202621BE32008577F9 /* ToonExtension.swift */; };
 		0B9062EE25EE99FB00F7E328 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062ED25EE99FB00F7E328 /* main.swift */; };
 		0B9062F625EEA17F00F7E328 /* Console.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062F525EEA17F00F7E328 /* Console.swift */; };
 		0B9062F925F116FD00F7E328 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9062F825F116FD00F7E328 /* Game.swift */; };
@@ -73,6 +74,7 @@
 		0B296D3526089163006AA880 /* ThermicWeapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermicWeapon.swift; sourceTree = "<group>"; };
 		0B296D3E2608EC0D006AA880 /* HumanPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HumanPlayer.swift; sourceTree = "<group>"; };
 		0B296D422608EC18006AA880 /* MachinePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MachinePlayer.swift; sourceTree = "<group>"; };
+		0B83EC202621BE32008577F9 /* ToonExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToonExtension.swift; sourceTree = "<group>"; };
 		0B9062EA25EE99FB00F7E328 /* FrenchGameFactory */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FrenchGameFactory; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B9062ED25EE99FB00F7E328 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		0B9062F525EEA17F00F7E328 /* Console.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Console.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 			children = (
 				0BE46A1825F2D51D0073884F /* Toon.swift */,
 				0BB302C025FCF542005C424F /* ToonModifier.swift */,
+				0B83EC202621BE32008577F9 /* ToonExtension.swift */,
 				0B296D1E2605E986006AA880 /* EngineerToon.swift */,
 				0B296D1B2605E94B006AA880 /* MilitaryToon.swift */,
 				0B296D172605E924006AA880 /* MedicalToon.swift */,
@@ -129,6 +132,7 @@
 		0B296D222605F64C006AA880 /* Meta */ = {
 			isa = PBXGroup;
 			children = (
+				0B210B91261CB386009D4BF9 /* Setting.swift */,
 				0B9062F525EEA17F00F7E328 /* Console.swift */,
 				0B189BAA26131FDE002C8635 /* DamageCase.swift */,
 				0B210B8D261C48F0009D4BF9 /* Extension.swift */,
@@ -139,7 +143,6 @@
 		0B296D232605F6E0006AA880 /* Game */ = {
 			isa = PBXGroup;
 			children = (
-				0B210B91261CB386009D4BF9 /* Setting.swift */,
 				0B9062F825F116FD00F7E328 /* Game.swift */,
 				0B21C93826206EE20049BB44 /* GameExtension */,
 			);
@@ -288,6 +291,7 @@
 				0B189BA32611C9A9002C8635 /* TeamUseMedicine.swift in Sources */,
 				0B210B7B261B0883009D4BF9 /* ExtraWeapon.swift in Sources */,
 				0B9062F925F116FD00F7E328 /* Game.swift in Sources */,
+				0B83EC212621BE32008577F9 /* ToonExtension.swift in Sources */,
 				0BE46A1C25F2D96E0073884F /* Tool.swift in Sources */,
 				0B296D1F2605E986006AA880 /* EngineerToon.swift in Sources */,
 				0BE46A1F25F420430073884F /* Player.swift in Sources */,
