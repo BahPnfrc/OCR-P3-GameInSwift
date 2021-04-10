@@ -87,16 +87,16 @@ class Console {
             do {
                 let rawInput = try getRawInput()
                 guard let intInput: Int = Int(rawInput) else {
-                    Console.write(1, 1, "⚠️ Expected number was not found : \(randomError) ⚠️", 1)
+                    Console.write(0, 1, "⚠️ Expected number was not found : \(randomError) ⚠️", 1)
                     continue
                 }
                 guard range.contains(intInput) else {
-                    Console.write(1, 1, "⚠️ \(intInput) is not expected : \(randomError) ⚠️".withNum(), 1)
+                    Console.write(0, 1, "⚠️ \(intInput) is not expected : \(randomError) ⚠️", 1)
                     continue
                 }
                 return intInput
             } catch {
-                Console.write(1,1, "⚠️ No input was found : \(randomError) ⚠️", 1)
+                Console.write(0,1, "⚠️ No input was found : \(randomError) ⚠️", 1)
                 continue
             }
         } while true
@@ -119,16 +119,16 @@ class Console {
             do {
                 let stringInput = try getRawInput()
                 if !allowSpace && contentCheck(content: stringInput, check: .whitespaces) {
-                    Console.write(1, 1, "⚠️ No space is allowed : \(defaultError) ⚠️", 1)
+                    Console.write(0, 1, "⚠️ No space is allowed : \(defaultError) ⚠️", 1)
                     continue
                 }
                 if !allowDigit && contentCheck(content: stringInput, check: .decimalDigits) {
-                    Console.write(1, 1, "⚠️ No digit is allowed : \(defaultError) ⚠️", 1)
+                    Console.write(0, 1, "⚠️ No digit is allowed : \(defaultError) ⚠️", 1)
                     continue
                 }
                 return stringInput
             } catch {
-                Console.write(1, 1, "⚠️ No input was found : \(randomError) ⚠️", 1)
+                Console.write(0, 1, "⚠️ No input was found : \(randomError) ⚠️", 1)
                 continue
             }
         } while true
@@ -138,7 +138,7 @@ class Console {
         guard let typedText = readLine() else { return false }
         return typedText == exitWord
     }
-    static func getBreakPrompt(tab: Int = 2) {
+    static func getBreakPrompt(tab: Int = 0) {
         Console.write(0, tab, "⏸ Press 'Enter' to continue ✅", 0)
         _ = readLine()
     }

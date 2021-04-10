@@ -15,7 +15,7 @@ final class Setting {
         
         static var fastPlayEnabled: Bool = false
         static let fastPlayLevel: Level
-            = useDefault ? .isHard : .isHard
+            = useDefault ? .isMedium : .isHard
         static let fastPlayOrder: Order
             = useDefault ? .chance : .second
     }

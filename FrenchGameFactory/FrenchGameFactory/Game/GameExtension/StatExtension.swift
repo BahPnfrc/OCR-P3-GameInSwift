@@ -59,9 +59,6 @@ extension Game {
     }
     
     private func _statStep_gameAward(withWinner winner: Player, withLoser loser: Player) {
-        //let totalScore: Int = player.main.finalScore + player.second.finalScore
-        //let winnerBar: String = _statStep_getBar(with: result.winner.finalScore, outOf: totalScore, legend: "total")
-        //let loserBar: String = _statStep_getBar(with: result.loser.finalScore, outOf: totalScore, legend: "total")
         Console.write(1, 0, "⏹ Round #️⃣\(roundPlayed)✅ : 🔔 *Ding Ding* We have a champion 🏆 !" .withNum(),0)
         Console.write(1, 1, """
             🏁 Winner : \(winner.name) with \(winner.finalScore) HP Taken + Healed
@@ -80,76 +77,55 @@ extension Game {
             survivorAward += "\(Medals[index]). 🎖" + toon.getPicWithName() + " : \(toon.lifeSet.hitpoints) HP Left\n"
         }
         Console.write(1, 1, """
-            Survivor ✨award✨ 👑 :"
+            1️⃣. Survivor ✨award✨ 👑 :"
             \(survivorAward)
             """, 0)
     }
     
     private func _statStep_otherAwards(withToons allToons: [Toon]) {
         
-        let bestDamageGiven : [Toon]  = allToons.sorted {$0.statSet.bestDamage.given > $1.statSet.bestDamage.given}
-        let mostDamageGiven: [Toon] = allToons.sorted {$0.statSet.totalDamage.given > $1.statSet.totalDamage.given}
-        let mostMedicineGiven: [Toon] = allToons.sorted {$0.statSet.medicine.given > $1.statSet.medicine.given}
+        let hitmanNominated : [Toon]  = allToons.sorted {$0.statSet.bestDamage.given > $1.statSet.bestDamage.given}
+        let berserkerNominated: [Toon] = allToons.sorted {$0.statSet.totalDamage.given > $1.statSet.totalDamage.given}
+        let doctorNominated: [Toon] = allToons.sorted {$0.statSet.medicine.given > $1.statSet.medicine.given}
         
-        let hitmanAward: String = _statStep_getBestDamageRank(
-            withToons: bestDamageGiven, withMaxIndex: 2,
-            withHeader: "Hitman ✨award✨ 🎯 :\n", withType: "HP Taken\n")
-        let berserkerAward: String = _statStep_getMostDamageRank(
-            withToons: mostDamageGiven, withMaxIndex: 2,
-            withHeader: "Berserker ✨award✨ ⚔️ :\n", withType: "HP Taken\n")
-        let doctorAward: String = _statStep_getMedicineRank(
-            withToons: mostMedicineGiven, withMaxIndex: 1,
-            withHeader: "Doctor ✨award✨ 🌡 :\n", withType: "HP Healed\n")
+        let hitmanAward: String = _statStep_getRank(
+            withToons: hitmanNominated, withMaxIndex: 2, withType: "Taken",
+            rankCheck: { (toons: [Toon]) -> Bool in return toons.allSatisfy({ $0.statSet.bestDamage.given == 0 }) },
+            rankValue: { (toon: Toon) -> Int in return toon.statSet.bestDamage.given })
+        let berserkerAward: String = _statStep_getRank(
+            withToons: berserkerNominated, withMaxIndex: 2, withType: "Taken",
+            rankCheck: { (toons: [Toon]) -> Bool in return toons.allSatisfy({ $0.statSet.totalDamage.given == 0 }) },
+            rankValue: { (toon: Toon) -> Int in return toon.statSet.totalDamage.given })
+        let doctorAward: String = _statStep_getRank(
+            withToons: doctorNominated, withMaxIndex: 1, withType: "Healed",
+            rankCheck: { (toons: [Toon]) -> Bool in return toons.allSatisfy({ $0.statSet.medicine.given == 0 }) },
+            rankValue: { (toon: Toon) -> Int in return toon.statSet.medicine.given })
         
         Console.write(0, 1, """
+            2️⃣. Hitman ✨award✨ 🎯 :
             \(hitmanAward)
+            3️⃣. Berserker ✨award✨ ⚔️ :
             \(berserkerAward)
+            4️⃣. Doctor ✨award✨ 🌡 :
             \(doctorAward)
             """, 0)
     }
     
     // MARK: D - TOOLS
-    private func _statStep_getBestDamageRank(
-            withToons toons: [Toon], withMaxIndex maxIndex: Int,
-            withHeader header: String, withType type: String) -> String {
-        var result: String = header
-        if toons.allSatisfy({ $0.statSet.bestDamage.given == 0 }) {
-            result += "- No toon was ranked\n"
+    private func _statStep_getRank(
+            withToons toons: [Toon], withMaxIndex maxIndex: Int, withType type: String,
+            rankCheck noRankCheck: ([Toon]) -> Bool,
+            rankValue getRankValue: (Toon) -> Int
+            ) -> String {
+        var result: String = ""
+        if noRankCheck(toons) == true {
+            return "- No toon was ranked\n"
         } else { for index in 0...maxIndex {
             guard maxIndex <= (Game.Medals.count - 1) else { break }
-            guard toons[index].statSet.bestDamage.given > 0 else { continue }
+            let toonRankValue = getRankValue(toons[index])
+            guard toonRankValue > 0 else { continue }
             result += Game.Medals[index] + ". " + toons[index].getPicWithName() + " : "
-                + String(toons[index].statSet.bestDamage.given) + " " + type
-        }}
-        return result
-    }
-    
-    private func _statStep_getMostDamageRank(
-            withToons toons: [Toon], withMaxIndex maxIndex: Int,
-            withHeader header: String, withType type: String) -> String {
-        var result: String = header
-        if toons.allSatisfy({ $0.statSet.totalDamage.given == 0 }) {
-            result += "- No toon was ranked\n"
-        } else { for index in 0...maxIndex {
-            guard maxIndex <= (Game.Medals.count - 1) else { break }
-            guard toons[index].statSet.totalDamage.given > 0 else { continue }
-            result += Game.Medals[index] + ". " + toons[index].getPicWithName() + " : "
-                + String(toons[index].statSet.totalDamage.given) + " " + type
-        }}
-        return result
-    }
-    
-    private func _statStep_getMedicineRank(
-            withToons toons: [Toon], withMaxIndex maxIndex: Int,
-            withHeader header: String, withType type: String) -> String {
-        var result: String = header
-        if toons.allSatisfy({ $0.statSet.medicine.given == 0 }) {
-            result += "- No toon was ranked\n"
-        } else { for index in 0...maxIndex {
-            guard maxIndex <= (Game.Medals.count - 1) else { break }
-            guard toons[index].statSet.medicine.given > 0 else { continue }
-            result += Game.Medals[index] + ". " + toons[index].getPicWithName() + " : "
-                + String(toons[index].statSet.medicine.given) + " " + type
+                + String(toonRankValue) + " HP " + type + "\n"
         }}
         return result
     }
