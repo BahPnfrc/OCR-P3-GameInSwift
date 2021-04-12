@@ -203,7 +203,7 @@ extension Game {
         let action = machine.PlayWithIA(game: self)
         if let doAttack = action.attackCase {
             Console.write(0, 1, "⚙️ \(attackingPlayer.name) made a choice and decided to attack :", 1)
-            _fightStep_machineFight(withToon: doAttack.attacker, againt: doAttack.defender)
+            _fightStep_machineFight(withToon: doAttack.attacker, against: doAttack.defender)
             return didMedicine
         } else {
             guard let doMedicine = action.medicineCase else {
@@ -219,7 +219,7 @@ extension Game {
         }
     }
     
-    private func _fightStep_machineFight(withToon attacker: Toon, againt defender: Toon) {
+    private func _fightStep_machineFight(withToon attacker: Toon, against defender: Toon) {
         let damage: Double = Weapon.getDamage(from: attacker, to: defender)
         _fightStep_applyDamage(from: attacker, to: defender, for: Int(damage))
         _figthStep_Report(from: attacker, to: defender, of: Double(damage))

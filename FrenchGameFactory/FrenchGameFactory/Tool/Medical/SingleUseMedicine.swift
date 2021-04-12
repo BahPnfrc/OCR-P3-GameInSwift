@@ -19,7 +19,7 @@ final class SingleUseMedicine: Medicine {
             toon.gainHP(from: doctor, for: hitpointsToRestore)
             Console.write(0, 1, """
                 ℹ️. \(toon.getPicWithName()) just had a \(self.getPicWithName()) :
-                \(toon.getHeOrShe(withMaj: true))gained \(hitpointsToRestore) hitpoints as expected 👍
+                \(toon.getHeOrShe(withMaj: true))gained \(hitpointsToRestore) HP as expected 👍
                 """, 1)
         } else { Console.write(0, 1, """
                     ℹ️. \(toon.getPicWithName()) just had a \(self.getPicWithName()) :
