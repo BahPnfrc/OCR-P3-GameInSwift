@@ -102,6 +102,27 @@ class Game {
         quit()
     }
     
+    func help() -> String {
+        var allDamages = Weapon.getAllDamageCases(
+                attackers: attackingPlayer.toons,
+                defenders: defendingPlayer.toons)
+        allDamages.shuffle()
+        var defendingIndex: Int = 0
+        for toon in defendingPlayer.toons {
+            if toon.isAlive() {
+                defendingIndex += 1
+                toon.promptID = defendingIndex
+            }
+        }
+        var attackingIndex = 0 ; let maxIndex = 3 ; var damageCases: [String] = []
+        for damageCase in allDamages {
+            attackingIndex += 1 ; if attackingIndex > maxIndex { break }
+            damageCases.append("\(String(damageCase.attacker.promptID).withNum()). \(damageCase.attacker.getPicWithName()) 🆚\(String(damageCase.defender.promptID).withNum()) \(damageCase.defender.getPicWithName()) : \(Int(damageCase.damage)) damages ✅")
+        }
+        let damageCasesAsString: String = damageCases.joined(separator: "\n")
+        return "✳️. Help was requested :\n\(damageCasesAsString)"
+    }
+    
     func quit() {
         Console.write(1, 1, "✨🦠✨ END OF THE GAME ✨🍄✨", 2)
     }

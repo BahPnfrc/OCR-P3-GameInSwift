@@ -37,12 +37,12 @@ final class MachinePlayer: Player {
         let machine: Player = game.attackingPlayer as! MachinePlayer
         let human: Player = game.defendingPlayer
         // B - Get all damages toons can deal to each others
-        self.attackCasesOnN0 = check_getAllDamageCases( // On this round N0
-                attackers: check_aliveOnly(machine.toons),
-                defenders: check_aliveOnly(human.toons))
-        self.defenseCasesOnN1 = check_getAllDamageCases( // On next round N1
-                attackers: check_aliveOnly(human.toons),
-                defenders: check_aliveOnly(machine.toons))
+        self.attackCasesOnN0 = Weapon.getAllDamageCases( // On this round N0
+                attackers: machine.toons,
+                defenders: human.toons)
+        self.defenseCasesOnN1 = Weapon.getAllDamageCases( // On next round N1
+                attackers: human.toons,
+                defenders: machine.toons)
         // C - Sort damages cases according to level
         switch game.level {
         case .isEasy: return play_Easy()

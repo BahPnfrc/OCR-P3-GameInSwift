@@ -67,7 +67,28 @@ class Weapon : Tool, DamageSet {
             * attacker.getAccuracy() / defender.getForsight()
         return damage
     }
+    
+    static func getAllDamageCases(attackers: [Toon], defenders: [Toon]) -> [(DamageCase)] {
+        var results: [DamageCase] = []
+        for attacker in attackers{
+            if !attacker.isAlive() { continue }
+            for defender in defenders{
+                if !defender.isAlive() { continue }
+                let damage: Double = Weapon.getDamage(from: attacker, to: defender)
+                let isLethal: Bool = defender.lifeSet.hitpoints - Int(damage) <= 0
+                let damageCase: DamageCase = DamageCase(
+                    attacker: attacker,
+                    defender: defender,
+                    damage: damage,
+                    isLethal: isLethal)
+                results.append(damageCase)
+            }
+        }
+        return results
+    }
 }
+
+    
 
 
 

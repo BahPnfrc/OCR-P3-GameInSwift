@@ -86,13 +86,14 @@ class Console {
         "➡️ Type 'help' ✳️ or a number from \(range.lowerBound) to \(range.upperBound) and press 'Enter' ✅".withNum(),
         0)
     }
-    static func getIntInput(fromTo range: ClosedRange<Int>, withHelp: Bool = false) -> Int {
+    static func getIntInput(fromTo range: ClosedRange<Int>, withHelp: Bool = false, inGame game: Game? = nil) -> Int {
         repeat {
             if withHelp { promptForIntInputWithHelp(range) }
             else { promptForIntInput(range) }
             do {
                 let rawInput = try getRawInput()
-                if withHelp && rawInput == "help" { _showHelp()
+                if withHelp && rawInput == "help" {
+                    if let game = game { Console.write(1, 1, game.help(), 1)}
                 } else {
                     guard let intInput: Int = Int(rawInput) else {
                         Console.write(0, 1, "⚠️ Expected number was not found : \(randomError) ⚠️", 1)
@@ -148,10 +149,6 @@ class Console {
             guard let typedText = readLine() else { return false }
             return typedText == exitWord
         }
-    }
-    
-    private static func _showHelp(enabled: Bool = true) {
-        if enabled { Console.write(1, 1, Toon.help, 1)}
     }
     
     static func getBreakPrompt(tab: Int = 0) {

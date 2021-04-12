@@ -9,26 +9,7 @@ import Foundation
 
 extension MachinePlayer {
     // MARK: B - Check for damages
-    func check_aliveOnly(_ toons: [Toon]) -> [Toon] {
-        return toons.filter({ $0.isAlive() == true })
-    }
-
-    func check_getAllDamageCases(attackers: [Toon], defenders: [Toon]) -> [(DamageCase)] {
-        var results: [DamageCase] = []
-        for attacker in attackers{
-            for defender in defenders{
-                let damage: Double = Weapon.getDamage(from: attacker, to: defender)
-                let isLethal: Bool = defender.lifeSet.hitpoints - Int(damage) <= 0
-                let damageCase: DamageCase = DamageCase(
-                    attacker: attacker,
-                    defender: defender,
-                    damage: damage,
-                    isLethal: isLethal)
-                results.append(damageCase)
-            }
-        }
-        return results
-    }
+    // Moved to Weapon Class
 
     // MARK: C - Check for scenarii
     func check_canTakeToonOrBestCase(attackCases: [DamageCase])

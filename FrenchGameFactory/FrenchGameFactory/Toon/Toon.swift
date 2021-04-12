@@ -206,12 +206,6 @@ class Toon: LifeSet, SkillSet, FightSet, StatSet {
         // Doctor
         medical.statSet.medicine.given += amount
     }
-    
-    static let help: String = """
-    ✳️. Help was requested :
-    1. Engineer is usually strong 🆚📈 Medical but weak 🆚📉 Military
-    2. Military is usually strong 🆚📈 Engineer but weak 🆚📉 Medical
-    3. Medical is usually strong 🆚📈 Military but weak 🆚📉 Engineer
-    """.withNum()
+
 }
 
